@@ -6,6 +6,11 @@
 		</view>
 		<uni-link :href="href" :text="href"></uni-link>
 		<view @click.stop="handleNavigateToTargetPage">去登录</view>
+		<ListComponent :listData="data">
+		      <template #default="{ item }">
+		        <text>2222</text>
+		      </template>
+		    </ListComponent>
 	</view>
 </template>
 
@@ -13,11 +18,18 @@
 	import {
 		u_navlist
 	} from '@/api'
+	import ListComponent from '@/components/custom-tabar/index.vue';
 	export default {
+		components: { ListComponent },
 		data() {
 			return {
 				href: 'https://k1sw.wiselink.net.cn/deskapi/navlist',
-				products: []
+				products: [],
+				data: [
+				        { name: 'Item 1' },
+				        { name: 'Item 2' },
+				        { name: 'Item 3' }
+				      ]
 			}
 		},
 		methods: {
