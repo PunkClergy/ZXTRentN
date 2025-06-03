@@ -1,22 +1,15 @@
+<!-- pages/login/login.vue -->
 <template>
 	<view class="container">
-		<!-- 标题 -->
-		<view class="title">登录</view>
-
-		<!-- 用户名输入框 -->
-		<input type="text" v-model="username" placeholder="请输入年龄" />
-
-		<!-- 密码输入框 -->
-		<input type="text" v-model="password" placeholder="请输入年龄" />
-
-		<!-- 登录按钮 -->
-		<button class="login-btn" @click="handleLogin">登录</button>
-
-		<!-- 注册链接 -->
-		<view class="register-link">
-			<text>还没有账号？</text>
-			<text class="link" @click="handleRegister">立即注册</text>
+		<view class="form-item">
+			<text>用户名</text>
+			<input type="text" v-model="username" placeholder="请输入用户名" />
 		</view>
+		<view class="form-item">
+			<text>密码</text>
+			<input type="password" v-model="password" placeholder="请输2入密码" />
+		</view>
+		<button @click="handleLogin">登录</button>
 	</view>
 </template>
 
@@ -27,110 +20,51 @@
 	export default {
 		data() {
 			return {
-				username: "", // 用户名
-				password: "", // 密码
-			};
+				username: '',
+				password: ''
+			}
 		},
 		methods: {
-
 			async handleLogin() {
 				if (!this.username || !this.password) {
 					uni.showToast({
-						title: "请输入用户名和密码",
-						icon: "none",
+						title: '请输入用户名和密码',
+						icon: 'none'
 					});
 					return;
 				}
+
 				try {
-					const res = await login({
-						username: 'admin',
-						password: '123456'
+					const response = await login({
+						username: this.username,
+						password: this.password,
+						type: 2
 					})
-					uni.setStorageSync('token', res.token)
+					uni.setStorageSync('token', response.content.token)
+					uni.setStorageSync('user_info', response.content)
+
+					// 跳转到首页或其他页面
+					uni.reLaunch({
+						url: '/pages/index/index'
+					});
 				} catch (error) {
-					console.error('登录失败', error)
+					uni.showToast({
+						title: '登录失败，请检查用户名和密码',
+						icon: 'none'
+					});
 				}
-			},
-
-
-			handleRegister() {
-				uni.navigateTo({
-					url: "/pages/register/register", // 跳转到注册页面
-				});
-			},
-		},
-	};
+			}
+		}
+	}
 </script>
 
-<style scoped>
-	/* 页面容器 */
+<style>
+	/* 样式代码 */
 	.container {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		padding: 40px;
-		min-height: 100vh;
-		background-color: #f5f5f5;
+		padding: 20px;
 	}
 
-	/* 标题样式 */
-	.title {
-		font-size: 28px;
-		font-weight: bold;
-		margin-bottom: 30px;
-		color: #333;
-	}
-
-	/* 输入框组 */
-	.input-group {
-		width: 100%;
+	.form-item {
 		margin-bottom: 20px;
-	}
-
-	/* 输入框样式 */
-	.input {
-		width: 100%;
-		padding: 12px;
-		font-size: 16px;
-		border: 1px solid #ddd;
-		border-radius: 8px;
-		background-color: #fff;
-		box-sizing: border-box;
-	}
-
-	/* 登录按钮 */
-	.login-btn {
-		width: 100%;
-		padding: 12px;
-		font-size: 18px;
-		color: #fff;
-		background-color: #007aff;
-		border: none;
-		border-radius: 8px;
-		cursor: pointer;
-	}
-
-	.login-btn:hover {
-		opacity: 0.9;
-	}
-
-	/* 注册链接 */
-	.register-link {
-		margin-top: 20px;
-		font-size: 14px;
-		color: #666;
-		text-align: center;
-	}
-
-	/* 链接文字样式 */
-	.link {
-		color: #007aff;
-		text-decoration: underline;
-		cursor: pointer;
-	}
-
-	.link:hover {
-		opacity: 0.8;
 	}
 </style>

@@ -20,11 +20,14 @@
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
+		"navigationStyle": "custom",
 		"navigationBarTitleText": "uni-app",
 		"navigationBarBackgroundColor": "#F8F8F8",
+		"onReachBottomDistance": 0,
 		"backgroundColor": "#F8F8F8",
 		"app-plus": {
 			"background": "#efeff4"
 		}
 	}
+
 }
