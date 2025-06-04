@@ -26,57 +26,68 @@
 			</view>
 		</view>
 
-		<!-- 轮播图区域 -->
-		<view class="swiper-container" :style="{ marginTop: `${navbarTotalHeight}px` }">
-			<!-- 轮播图组件：数据为空时不渲染 -->
-			<swiper v-if="hasBannerData" :indicator-dots="false" :autoplay="true" :interval="3000" :duration="500"
-				:circular="true">
-				<swiper-item v-for="(item, index) in validBanners" :key="`banner-${item.id || index}`">
-					<!-- 轮播图项：添加加载失败处理 -->
-					<image :src="getBannerUrl(item.img)" mode="scaleToFill" @error="handleImageError(index)" />
-				</swiper-item>
-			</swiper>
+		<!-- 内容容器：包裹所有可滚动内容 -->
+		<view class="content-container" :style="{
+			'--navbar-height': `${navbarTotalHeight}px`,
+			'--swiper-height': `${swiperHeight}px`
+		}">
+			<!-- 轮播图区域 -->
+			<view class="swiper-container">
+				<!-- 轮播图组件：数据为空时不渲染 -->
+				<swiper v-if="hasBannerData" :indicator-dots="false" :autoplay="true" :interval="3000" :duration="500"
+					:circular="true" :style="{ height: `${swiperHeight}px` }">
+					<swiper-item v-for="(item, index) in validBanners" :key="`banner-${item.id || index}`">
+						<!-- 轮播图项：添加加载失败处理 -->
+						<image :src="getBannerUrl(item.img)" mode="scaleToFill" @error="handleImageError(index)" />
+					</swiper-item>
+				</swiper>
 
-			<!-- 轮播图加载状态提示 -->
-			<view v-else-if="isLoading" class="loading-placeholder">
-				<text>加载轮播图中...</text>
+				<!-- 轮播图加载状态提示 -->
+				<view v-else-if="isLoading" class="loading-placeholder" :style="{ height: `${swiperHeight}px` }">
+					<text>加载轮播图中...</text>
+				</view>
+
+				<!-- 轮播图空状态提示 -->
+				<view v-else class="empty-placeholder" :style="{ height: `${swiperHeight}px` }">
+					<text>暂无轮播图数据</text>
+				</view>
 			</view>
 
-			<!-- 轮播图空状态提示 -->
-			<view v-else class="empty-placeholder">
-				<text>暂无轮播图数据</text>
-			</view>
-		</view>
-
-		<!-- 快捷菜单区域 -->
-		<view class="quick-container">
-			<!-- 快捷菜单轮播：数据为空时不渲染 -->
-			<swiper v-if="hasMenuData" :indicator-dots="false" :autoplay="false" :circular="true" class="menu-swiper">
-				<swiper-item v-for="(page, pageIndex) in menuPages" :key="`menu-page-${pageIndex}`">
-					<view class="menu-grid">
-						<view v-for="(item, itemIndex) in page" :key="`menu-${item.id || itemIndex}`" class="menu-item"
-							@tap="handleMenuItemTap(item)">
-							<!-- 菜单图标：带备用图和错误处理 -->
-							<image :src="getMenuIconUrl(item.icon)" mode="scaleToFill" class="menu-icon"
-								@error="handleMenuIconError(item.id)" />
-							<text class="menu-text">{{ item.name }}</text>
+			<!-- 快捷菜单区域 -->
+			<view class="quick-container">
+				<!-- 快捷菜单轮播：数据为空时不渲染 -->
+				<swiper v-if="hasMenuData" :indicator-dots="false" :autoplay="false" :circular="true"
+					class="menu-swiper">
+					<swiper-item v-for="(page, pageIndex) in menuPages" :key="`menu-page-${pageIndex}`">
+						<view class="menu-grid">
+							<view v-for="(item, itemIndex) in page" :key="`menu-${item.id || itemIndex}`"
+								class="menu-item" @tap="handleMenuItemTap(item)">
+								<!-- 菜单图标：带备用图和错误处理 -->
+								<image :src="getMenuIconUrl(item.icon)" mode="scaleToFill" class="menu-icon"
+									@error="handleMenuIconError(item.id)" />
+								<text class="menu-text">{{ item.name }}</text>
+							</view>
 						</view>
-					</view>
-				</swiper-item>
-			</swiper>
+					</swiper-item>
+				</swiper>
 
-			<!-- 快捷菜单加载状态 -->
-			<view v-else-if="isLoading" class="loading-placeholder">
-				<text>加载菜单中...</text>
+				<!-- 快捷菜单加载状态 -->
+				<view v-else-if="isLoading" class="loading-placeholder">
+					<text>加载菜单中...</text>
+				</view>
+
+				<!-- 快捷菜单空状态 -->
+				<view v-else class="empty-placeholder">
+					<text>暂无菜单数据</text>
+				</view>
 			</view>
 
-			<!-- 快捷菜单空状态 -->
-			<view v-else class="empty-placeholder">
-				<text>暂无菜单数据</text>
+			<!-- 主内容区域：自动填充剩余空间 -->
+			<view class="main-contentArea-container">
+				<view style="width:34%;border: 1px solid red;">1</view>
+				<view style="width: 64%;border: 1px solid gold;">2</view>
 			</view>
 		</view>
-
-		<view class="main-contentArea-container" :style="{height:`${safeScreenHeight-navbarTotalHeight-100-150-20}px`}">222</view>
 	</view>
 </template>
 
@@ -91,7 +102,7 @@
 	} from '@/utils/scheme/screen.js'
 	import 'url-search-params-polyfill';
 	// 常量定义
-	const DEFAULT_BANNER_RATIO = 9 / 16 // 轮播图默认宽高比 (16:9)
+	const DEFAULT_BANNER_RATIO = 671 / 2090 // 轮播图默认宽高比 (16:9)
 	const MENU_ITEMS_PER_PAGE = 5 // 每页菜单项数量
 	const DEFAULT_MENU_ICON = '/static/public/default-icon.png'
 
@@ -105,7 +116,8 @@
 				menuList: [], // 菜单原始数据
 				isLoading: false, // 全局加载状态
 				imageErrors: new Set(), // 图片加载错误记录
-				iconErrors: new Set() // 图标加载错误记录
+				iconErrors: new Set(), // 图标加载错误记录
+				contentData: [] // 主内容区域数据
 			}
 		},
 
@@ -403,6 +415,17 @@
 		overflow-x: hidden;
 	}
 
+	/* 新增：内容容器（弹性容器，填充剩余空间） */
+	.content-container {
+		flex: 1;
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		padding-top: var(--navbar-height);
+		/* 使用变量传递导航栏高度 */
+		overflow: hidden;
+	}
+
 	/* ===== 导航栏样式 ===== */
 	.custom-navbar {
 		width: 100%;
@@ -471,8 +494,9 @@
 	/* ===== 轮播图区域 ===== */
 	.swiper-container {
 		width: 98%;
+		margin: 10rpx auto 0;
 		position: relative;
-		border: 1px solid red;
+		z-index: 10;
 	}
 
 	swiper {
@@ -483,17 +507,18 @@
 		width: 100%;
 		height: 100%;
 		display: block;
-		/* background-color: #f5f5f5; */
 	}
 
 	/* ===== 快捷菜单区域 ===== */
 	.quick-container {
 		width: 98%;
+		margin: 10rpx auto 0;
 		position: relative;
-		margin-top: 10rpx;
-		padding: 0rpx;
 		background-color: #fff;
-		border: 1px solid red;
+		border-radius: 12rpx;
+		box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+		overflow: hidden;
+		z-index: 5;
 	}
 
 	.menu-swiper {
@@ -532,10 +557,26 @@
 		line-height: 1.2;
 	}
 
+	/* 主内容区域：自动填充剩余空间 */
+	.main-contentArea-container {
+		flex: 1;
+		width: 98%;
+		margin: 10rpx auto;
+		display: flex;
+		flex-direction: row;
+		background: #fff;
+		border-radius: 12rpx;
+		box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+		overflow: hidden;
+		justify-content: space-between;
+		min-height: 200rpx;
+		/* 最小高度保证可见性 */
+	}
+
+
 	/* ===== 通用占位符样式 ===== */
 	.loading-placeholder,
 	.empty-placeholder {
-		height: 300rpx;
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -543,7 +584,6 @@
 		color: #999;
 		font-size: 28rpx;
 		border-radius: 12rpx;
-		margin: 20rpx;
 	}
 
 	.empty-placeholder {
@@ -553,11 +593,5 @@
 	.quick-container .loading-placeholder,
 	.quick-container .empty-placeholder {
 		height: 180rpx;
-	}
-
-	.main-contentArea-container {
-		margin-top: 10rpx;
-		border: 1px solid red;
-		width: 98%;
 	}
 </style>
