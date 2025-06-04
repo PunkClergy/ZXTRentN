@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "url-search-params-polyfill": "^8.2.5"
+  }
+}
