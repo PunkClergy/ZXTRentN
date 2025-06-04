@@ -1,6 +1,6 @@
 <template>
 	<!-- 主容器：高度动态适配屏幕 -->
-	<view class="container" :style="{ height: `${safeScreenHeight}px` }">
+	<view class="container" :style="{ height: `${safeScreenHeight}px` }" @touchmove.prevent="handleTouchMove">
 		<!-- 自定义导航栏 -->
 		<view class="custom-navbar" :style="{ height: navbarTotalHeight + 'px' }">
 			<!-- 状态栏占位视图 -->
@@ -76,7 +76,7 @@
 			</view>
 		</view>
 
-		222
+		<view class="main-contentArea-container" :style="{height:`${safeScreenHeight-navbarTotalHeight-100-150-20}px`}">222</view>
 	</view>
 </template>
 
@@ -189,6 +189,10 @@
 		},
 
 		methods: {
+			handleTouchMove(e) {
+				// 阻止默认滚动行为
+				return false;
+			},
 			/**
 			 * 初始化屏幕信息
 			 * 获取设备屏幕参数用于布局计算
@@ -466,8 +470,9 @@
 
 	/* ===== 轮播图区域 ===== */
 	.swiper-container {
-		width: 100%;
+		width: 98%;
 		position: relative;
+		border: 1px solid red;
 	}
 
 	swiper {
@@ -478,16 +483,17 @@
 		width: 100%;
 		height: 100%;
 		display: block;
-		background-color: #f5f5f5;
+		/* background-color: #f5f5f5; */
 	}
 
 	/* ===== 快捷菜单区域 ===== */
 	.quick-container {
-		width: 100%;
+		width: 98%;
 		position: relative;
-		margin-top: 20rpx;
-		padding: 0 20rpx;
-		box-sizing: border-box;
+		margin-top: 10rpx;
+		padding: 0rpx;
+		background-color: #fff;
+		border: 1px solid red;
 	}
 
 	.menu-swiper {
@@ -547,5 +553,11 @@
 	.quick-container .loading-placeholder,
 	.quick-container .empty-placeholder {
 		height: 180rpx;
+	}
+
+	.main-contentArea-container {
+		margin-top: 10rpx;
+		border: 1px solid red;
+		width: 98%;
 	}
 </style>

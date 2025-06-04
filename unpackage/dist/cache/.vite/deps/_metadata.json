@@ -1,8 +1,15 @@
 {
-  "hash": "4864567d",
-  "configHash": "ab797566",
-  "lockfileHash": "e3b0c442",
-  "browserHash": "119ea12a",
-  "optimized": {},
+  "hash": "4b114dfd",
+  "configHash": "4669c314",
+  "lockfileHash": "61b47003",
+  "browserHash": "9a4a9514",
+  "optimized": {
+    "url-search-params-polyfill": {
+      "src": "../../../../../node_modules/url-search-params-polyfill/index.js",
+      "file": "url-search-params-polyfill.js",
+      "fileHash": "3b467c91",
+      "needsInterop": true
+    }
+  },
   "chunks": {}
 }
