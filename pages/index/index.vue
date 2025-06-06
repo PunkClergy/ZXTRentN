@@ -1,6 +1,6 @@
 <template>
 	<!-- 主容器：高度动态适配屏幕 -->
-	<view class="container" :style="{ height: `${safeScreenHeight}px` }">
+	<view class="container" :style="{ height: `${safeScreenHeight}px` }" @touchmove.prevent="handleTouchMove">
 		<!-- 自定义导航栏 -->
 		<view class="custom-navbar" :style="{ height: navbarTotalHeight + 'px' }">
 			<!-- 状态栏占位视图 -->
@@ -63,9 +63,12 @@
 							<view v-for="(item, itemIndex) in page" :key="`menu-${item.id || itemIndex}`"
 								class="menu-item" @tap="handleMenuItemTap(item)">
 								<!-- 菜单图标：带备用图和错误处理 -->
-								<image :src="getMenuIconUrl(item.icon)" mode="scaleToFill" class="menu-icon"
-									@error="handleMenuIconError(item.id)" />
-								<text class="menu-text">{{ item.name }}</text>
+								<view :class="{ currentActive: currentQuick === item.id }" class="menu-item-current">
+									<image :src="getMenuIconUrl(item.icon)" mode="scaleToFill" class="menu-icon"
+										@error="handleMenuIconError(item.id)" />
+									<text class="menu-text">{{ item.name }}</text>
+								</view>
+
 							</view>
 						</view>
 					</swiper-item>
@@ -146,7 +149,8 @@
 				main_coverage: [], // 主内容区域数据
 				activeIndex: 0, // 当前激活的分类索引
 				scrollTop: 0, // 右侧滚动位置
-				categoryTopPositions: [] // 分类位置数组
+				categoryTopPositions: [], // 分类位置数组
+				currentQuick: '', //当前点击快捷入口ID
 			};
 		},
 
@@ -226,6 +230,10 @@
 		},
 
 		methods: {
+			// 阻止默认滚动行为
+			handleTouchMove() {
+				return false;
+			},
 			// 切换分类
 			switchCategory(index) {
 				if (index >= 0 && index < this.categoryTopPositions.length) {
@@ -408,7 +416,7 @@
 					// 重置滚动位置
 					this.activeIndex = 0;
 					this.scrollTop = 0;
-
+					this.currentQuick = item?.id
 					// 计算新位置
 					await this.calculateCategoryPositions();
 				} catch (error) {
@@ -610,13 +618,30 @@
 		flex-direction: column;
 		align-items: center;
 		margin-bottom: 20rpx;
-		padding: 10rpx;
+		padding: 5rpx;
 		box-sizing: border-box;
 		transition: var(--transition);
 	}
 
 	.menu-item:active {
 		transform: scale(0.95);
+
+	}
+
+	.menu-item-current {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		line-height: 30rpx;
+		padding: 10rpx 0;
+	}
+
+	.currentActive {
+		background: rgb(169, 169, 169);
+		height: 100%;
+		color: #fff;
+		border-radius: 8rpx;
+
 	}
 
 	.menu-icon {
