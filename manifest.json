@@ -1,5 +1,5 @@
 {
-    "name" : "ZXTRentN",
+    "name" : "智信通",
     "appid" : "__UNI__0192300",
     "description" : "",
     "versionName" : "1.0.2",
@@ -54,7 +54,7 @@
     /* 快应用特有相关 */
     "mp-weixin" : {
         /* 小程序特有相关 */
-        "appid" : "",
+        "appid" : "wxba6c63453f7bdd31",
         "setting" : {
             "urlCheck" : false
         },
