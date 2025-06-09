@@ -114,15 +114,8 @@
 				</scroll-view>
 			</view>
 		</view>
-		<view class="tabr-container">
-			<block v-for="(evt, index) in products" :key="index">
-				<view class="tabr-item">
-					<image :src="`${baseLink}/img/${evt.text =='首页'?evt.selectedIconPath:evt.iconPath}`"
-						class="tabr-icon" />
-					<text :class="{ tabrActive: evt.text =='首页' }" class="tabr-text">{{ evt.text }}</text>
-				</view>
-			</block>
-		</view>
+		<!-- 底部tabr -->
+		<CustomTabar selectedTab="首页" />
 
 	</view>
 </template>
@@ -133,13 +126,12 @@
 		u_bannerlist,
 		u_midMenulist,
 		u_rightMenulist,
-		u_navlist
 	} from '@/api'
 	import {
 		info_screen
 	} from '@/utils/scheme/screen.js'
 	import 'url-search-params-polyfill';
-
+	import CustomTabar from "@/components/custom-tabar/index.vue";
 	// 常量定义
 	const DEFAULT_BANNER_RATIO = 671 / 2090; // 轮播图默认宽高比
 	const MENU_ITEMS_PER_PAGE = 5; // 每页菜单项数量
@@ -147,9 +139,11 @@
 	const SCROLL_THRESHOLD = 10; // 滚动激活阈值(px)
 
 	export default {
+		components: {
+			CustomTabar
+		},
 		data() {
 			return {
-				products: [],
 				screenInfo: {}, // 屏幕信息对象
 				logo: '', // Logo图片地址
 				baseLink: 'https://k1sw.wiselink.net.cn', // 基础域名
@@ -242,15 +236,7 @@
 		},
 
 		methods: {
-			handleNavlist() {
-				console.log(u_navlist)
-				const response = u_navlist().then(response => {
-					console.log(response)
-					this.products = response.content
 
-				})
-
-			},
 			// 阻止默认滚动行为
 			handleTouchMove() {
 				return false;
@@ -453,6 +439,15 @@
 			handleChildItemTap(item) {
 				console.log('子项点击:', item);
 				// 这里添加实际跳转逻辑
+				uni.navigateTo({
+					url: '/pages/carRental/vehicleList/index',
+					success: () => {
+						console.log('跳转成功');
+					},
+					fail: (err) => {
+						console.error('跳转失败', err);
+					}
+				});
 			},
 
 			// 跳转首页
@@ -481,7 +476,6 @@
 					this.initialLogo(),
 					this.initialBannerList(),
 					this.initialMenuList(),
-					this.handleNavlist()
 				]);
 
 				// 初始化后计算位置
@@ -798,37 +792,5 @@
 	.quick-container .loading-placeholder,
 	.quick-container .empty-placeholder {
 		height: 180rpx;
-	}
-
-	.tabr-container {
-		display: flex;
-		flex-direction: row;
-		height: 100rpx;
-		justify-content: space-between;
-		width: 98%;
-		align-items: center;
-		margin: auto;
-		background-color: #fff;
-		padding: 10rpx;
-	}
-
-	.tabr-item {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
-
-	.tabr-icon {
-		width: 50rpx;
-		height: 50rpx;
-	}
-
-	.tabr-text {
-		font-size: 28rpx;
-		color: #333;
-	}
-
-	.tabrActive {
-		color: #007aff;
 	}
 </style>

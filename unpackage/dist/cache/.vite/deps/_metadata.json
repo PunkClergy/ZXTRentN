@@ -1,13 +1,13 @@
 {
-  "hash": "4b114dfd",
+  "hash": "2a0289cf",
   "configHash": "4669c314",
-  "lockfileHash": "61b47003",
-  "browserHash": "9a4a9514",
+  "lockfileHash": "1b6e7cdd",
+  "browserHash": "e6b9c72b",
   "optimized": {
     "url-search-params-polyfill": {
       "src": "../../../../../node_modules/url-search-params-polyfill/index.js",
       "file": "url-search-params-polyfill.js",
-      "fileHash": "3b467c91",
+      "fileHash": "f18fd58a",
       "needsInterop": true
     }
   },
