@@ -114,6 +114,16 @@
 				</scroll-view>
 			</view>
 		</view>
+		<view class="tabr-container">
+			<block v-for="(evt, index) in products" :key="index">
+				<view class="tabr-item">
+					<image :src="`${baseLink}/img/${evt.text =='首页'?evt.selectedIconPath:evt.iconPath}`"
+						class="tabr-icon" />
+					<text :class="{ tabrActive: evt.text =='首页' }" class="tabr-text">{{ evt.text }}</text>
+				</view>
+			</block>
+		</view>
+
 	</view>
 </template>
 
@@ -122,7 +132,8 @@
 		u_logo,
 		u_bannerlist,
 		u_midMenulist,
-		u_rightMenulist
+		u_rightMenulist,
+		u_navlist
 	} from '@/api'
 	import {
 		info_screen
@@ -138,6 +149,7 @@
 	export default {
 		data() {
 			return {
+				products: [],
 				screenInfo: {}, // 屏幕信息对象
 				logo: '', // Logo图片地址
 				baseLink: 'https://k1sw.wiselink.net.cn', // 基础域名
@@ -230,6 +242,15 @@
 		},
 
 		methods: {
+			handleNavlist() {
+				console.log(u_navlist)
+				const response = u_navlist().then(response => {
+					console.log(response)
+					this.products = response.content
+
+				})
+
+			},
 			// 阻止默认滚动行为
 			handleTouchMove() {
 				return false;
@@ -459,7 +480,8 @@
 					this.initialScreenInfo(),
 					this.initialLogo(),
 					this.initialBannerList(),
-					this.initialMenuList()
+					this.initialMenuList(),
+					this.handleNavlist()
 				]);
 
 				// 初始化后计算位置
@@ -776,5 +798,37 @@
 	.quick-container .loading-placeholder,
 	.quick-container .empty-placeholder {
 		height: 180rpx;
+	}
+
+	.tabr-container {
+		display: flex;
+		flex-direction: row;
+		height: 100rpx;
+		justify-content: space-between;
+		width: 98%;
+		align-items: center;
+		margin: auto;
+		background-color: #fff;
+		padding: 10rpx;
+	}
+
+	.tabr-item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.tabr-icon {
+		width: 50rpx;
+		height: 50rpx;
+	}
+
+	.tabr-text {
+		font-size: 28rpx;
+		color: #333;
+	}
+
+	.tabrActive {
+		color: #007aff;
 	}
 </style>
