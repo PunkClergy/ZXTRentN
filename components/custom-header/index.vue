@@ -9,7 +9,7 @@
 				<image src="/static/public/left.png" style="width: 50rpx;height: 50rpx;"></image>
 				<image src="/static/public/home.png" style="width: 50rpx;height: 50rpx;"></image>
 			</view>
-			<view>{{title}}</view>
+			<view style="font-size: 34rpx;font-weight: 600;">{{title}}</view>
 		</view>
 	</view>
 </template>
@@ -86,36 +86,6 @@
 </script>
 
 <style scoped>
-	/* ===== 基础变量 ===== */
-	:root {
-		--primary-color: #007aff;
-		--text-dark: #1a1a1a;
-		--text-gray: #666;
-		--text-light: #999;
-		--bg-light: #f9f9f9;
-		--border-radius: 12rpx;
-		--box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
-		--transition: all 0.3s ease;
-	}
-
-	/* ===== 基础布局 ===== */
-	.container {
-		width: 100%;
-		display: flex;
-		flex-direction: column;
-		background: url('/static/public/bg.png') no-repeat center / cover;
-		overflow-x: hidden;
-	}
-
-	.content-container {
-		flex: 1;
-		width: 100%;
-		display: flex;
-		flex-direction: column;
-		padding-top: var(--navbar-height);
-		overflow: hidden;
-	}
-
 	/* ===== 导航栏样式 ===== */
 	.custom-navbar {
 		width: 100%;
@@ -123,8 +93,7 @@
 		top: 0;
 		left: 0;
 		z-index: 1000;
-		background: rgba(255, 255, 255, 0.98);
-		box-shadow: var(--box-shadow);
+		box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
 		backdrop-filter: blur(10rpx);
 	}
 
