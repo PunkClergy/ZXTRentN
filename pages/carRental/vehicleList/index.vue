@@ -15,7 +15,7 @@
 
 			<!-- 车辆列表区域 -->
 			<block v-if="g_activeTab == 1">
-				<scroll-view style="height: 85vh" scroll-y @scrolltolower="lower">
+				<scroll-view style="height: 100vh" scroll-y @scrolltolower="lower">
 					<block v-for="(item, index) in g_items" :key="index">
 						<view class="content-item">
 							<view class="content-item-head">
@@ -77,7 +77,7 @@
 
 			<!-- 新增车辆区域 -->
 			<block v-if="g_activeTab == 2">
-				<scroll-view scroll-y style="height: 85vh">
+				<scroll-view scroll-y style="height: 100vh">
 					<view class="card-info">
 						<!-- 车牌号 -->
 						<view class="card-info-item">
@@ -162,7 +162,8 @@
 
 <script>
 	import {
-		u_getCarList
+		u_getCarList,
+		u_addOrUpdateCar
 	} from '@/api'
 	import CustomNavBar from "@/components/custom-header/index.vue";
 	import {
@@ -192,6 +193,16 @@
 			this.initialCarList()
 			this.initialScreenInfo()
 		},
+		watch: {
+		    g_activeTab(newVal) {
+		        if (newVal === 1) {
+		            // 确保在DOM更新后执行数据加载
+		            this.$nextTick(() => {
+		                this.initialCarList();
+		            });
+		        }
+		    }
+		}
 		computed: {
 			// 状态栏高度
 			statusBarHeight() {
@@ -275,15 +286,39 @@
 			},
 			handleBindinput(evt, text) {
 				console.log(evt, text)
+				this.params[text] = evt.detail.value
 			},
 			// 确认修改
-			handleSubmit() {
-				console.log(this.params)
+			async handleSubmit() {
+				const _this = this
+				const params = this.params
+				let temp = {
+					id: params?.id || '',
+					ccdate: params?.ccdate,
+					platenumber: params?.platenumber,
+					sn: params?.sn,
+					vehicleModeName: params?.vehicleModeName,
+					vehicleSerialName: params?.vehicleSerialName,
+					vin: params?.vin,
+					xsgw: params?.xsgw,
+					batterylift: this.batterylift
+				}
+				u_addOrUpdateCar(temp).then(res => {
+					if (res.code == 1000) {
+						_this.g_activeTab = 1
+						_this.g_items = []
+						_this.g_page = 1
+						setTimeout(() => {
+							_this.initialCarList()
+						}, 1000)
+					}
+				})
 			},
 			handleBatterylift(evt) {
 				console.log(evt)
 				this.batterylift = evt
 			}
+
 		}
 	};
 </script>
