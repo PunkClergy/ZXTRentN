@@ -6,8 +6,10 @@
 		<view class="nav-bar" :style="{ height: navBarHeight + 'px' }"
 			style="display: flex;gap: 100rpx;justify-content: flex-start">
 			<view style="display: flex;align-items: center;gap: 30rpx;">
-				<image src="/static/public/left.png" style="width: 50rpx;height: 50rpx;"></image>
-				<image src="/static/public/home.png" style="width: 50rpx;height: 50rpx;"></image>
+				<image src="/static/public/left.png" class="action-icon back-icon" 
+					@click="handleBack"></image>
+				<image src="/static/public/home.png" class="action-icon home-icon"
+					@tap="handleHome"></image>
 			</view>
 			<view style="font-size: 34rpx;font-weight: 600;">{{title}}</view>
 		</view>
@@ -47,6 +49,20 @@
 					});
 				}
 			},
+			// 返回按钮事件
+			handleBack() {
+				this.$emit('back');
+				uni.navigateBack();
+			},
+
+			// 首页按钮事件
+			handleHome() {
+				this.$emit('home');
+				console.log((uni))
+				uni.switchTab({
+					url: '/pages/index/index'
+				});
+			}
 		},
 		computed: {
 			// 当前用户信息
@@ -111,5 +127,12 @@
 		gap: 20rpx;
 		height: 100%;
 		width: 100%;
+	}
+
+	/* ===== 操作图标 ===== */
+	.action-icon {
+		width: 50rpx;
+		height: 50rpx;
+		flex-shrink: 0;
 	}
 </style>
