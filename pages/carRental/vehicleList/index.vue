@@ -193,16 +193,6 @@
 			this.initialCarList()
 			this.initialScreenInfo()
 		},
-		watch: {
-		    g_activeTab(newVal) {
-		        if (newVal === 1) {
-		            // 确保在DOM更新后执行数据加载
-		            this.$nextTick(() => {
-		                this.initialCarList();
-		            });
-		        }
-		    }
-		}
 		computed: {
 			// 状态栏高度
 			statusBarHeight() {
