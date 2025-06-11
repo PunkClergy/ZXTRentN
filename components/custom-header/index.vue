@@ -95,6 +95,7 @@
 		z-index: 1000;
 		box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
 		backdrop-filter: blur(10rpx);
+		background-color: #fff;
 	}
 
 	.nav-bar {
