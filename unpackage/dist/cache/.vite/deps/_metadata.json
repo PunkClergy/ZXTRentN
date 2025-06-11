@@ -2,14 +2,24 @@
   "hash": "2a0289cf",
   "configHash": "4669c314",
   "lockfileHash": "1b6e7cdd",
-  "browserHash": "e6b9c72b",
+  "browserHash": "5665ef97",
   "optimized": {
+    "@googlemaps/js-api-loader": {
+      "src": "../../../../../node_modules/@googlemaps/js-api-loader/dist/index.mjs",
+      "file": "@googlemaps_js-api-loader.js",
+      "fileHash": "4d82ea9b",
+      "needsInterop": false
+    },
     "url-search-params-polyfill": {
       "src": "../../../../../node_modules/url-search-params-polyfill/index.js",
       "file": "url-search-params-polyfill.js",
-      "fileHash": "f18fd58a",
+      "fileHash": "a7ac9b51",
       "needsInterop": true
     }
   },
-  "chunks": {}
+  "chunks": {
+    "chunk-Y2F7D3TJ": {
+      "file": "chunk-Y2F7D3TJ.js"
+    }
+  }
 }

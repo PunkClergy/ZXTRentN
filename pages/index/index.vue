@@ -87,9 +87,9 @@
 
 			<!-- 主内容区域：自动填充剩余空间 -->
 			<view class="main-content-container">
-				
+
 				<!-- 地图 -->
-				
+
 				<!-- 左侧导航 -->
 				<scroll-view scroll-y class="left-nav">
 					<view v-for="(item, index) in main_coverage" :key="index" class="category-item"
@@ -191,6 +191,9 @@
 
 			// 安全的屏幕高度
 			safeScreenHeight() {
+				uni.hideTabBar({
+					animation: true
+				})
 				return this.screenInfo.screenHeight || 667;
 			},
 
