@@ -280,29 +280,68 @@
 			},
 			// 确认修改
 			async handleSubmit() {
-				const _this = this
-				const params = this.params
-				let temp = {
-					id: params?.id || '',
-					ccdate: params?.ccdate,
-					platenumber: params?.platenumber,
-					sn: params?.sn,
-					vehicleModeName: params?.vehicleModeName,
-					vehicleSerialName: params?.vehicleSerialName,
-					vin: params?.vin,
-					xsgw: params?.xsgw,
-					batterylift: this.batterylift
+				const {
+					params
+				} = this;
+				const {
+					id,
+					ccdate,
+					platenumber,
+					sn,
+					vehicleModeName,
+					vehicleSerialName,
+					vin,
+					xsgw
+				} = params;
+
+				if (!platenumber || !sn) {
+					uni.showToast({
+						title: '车牌号或设备号不能为空',
+						icon: 'none'
+					});
+					return;
 				}
-				u_addOrUpdateCar(temp).then(res => {
-					if (res.code == 1000) {
-						_this.g_activeTab = 1
-						_this.g_items = []
-						_this.g_page = 1
-						setTimeout(() => {
-							_this.initialCarList()
-						}, 1000)
+
+				const submitData = {
+					id: id || '',
+					ccdate,
+					platenumber,
+					sn,
+					vehicleModeName,
+					vehicleSerialName,
+					vin,
+					xsgw,
+					batterylift: this.batterylift
+				};
+
+				try {
+					const res = await u_addOrUpdateCar(submitData);
+					if (res.code === 1000) {
+						uni.showToast({
+							title: '提交成功',
+							icon: 'success'
+						});
+
+						// 更新状态并重置分页
+						this.g_activeTab = 1;
+						this.g_items = [];
+						this.g_page = 1;
+						this.$nextTick(() => {
+							this.initialCarList();
+						});
+					} else {
+						uni.showToast({
+							title: res.msg || '提交失败',
+							icon: 'none'
+						});
 					}
-				})
+				} catch (error) {
+					console.error('提交出错:', error);
+					uni.showToast({
+						title: '网络异常，请重试',
+						icon: 'none'
+					});
+				}
 			},
 			handleBatterylift(evt) {
 				console.log(evt)
