@@ -89,32 +89,40 @@
 			<view class="main-content-container">
 
 				<!-- 地图 -->
+				<block v-if="currentQuick==540">
+					显示地图
+			<!-- 	1、引入谷歌地图 （且H5 安卓APP IOSAPP）都可以正常显示
+				*2、当前位置定位点（不支持点击）、所有车辆位置点-点击出现浮层显示车牌号和地址（模拟数据）、车辆行驶轨迹*
+				3、回到当前位置、打开谷歌地图APP
+				4、地图上有几个浮层可以点击（模拟点击，打印console） -->
+				</block>
+				<block v-else>
+					<!-- 左侧导航 -->
+					<scroll-view scroll-y class="left-nav">
+						<view v-for="(item, index) in main_coverage" :key="index" class="category-item"
+							:class="{ active: activeIndex === index }" @tap="switchCategory(index)">
+							{{ item.name }}
+						</view>
+					</scroll-view>
 
-				<!-- 左侧导航 -->
-				<scroll-view scroll-y class="left-nav">
-					<view v-for="(item, index) in main_coverage" :key="index" class="category-item"
-						:class="{ active: activeIndex === index }" @tap="switchCategory(index)">
-						{{ item.name }}
-					</view>
-				</scroll-view>
-
-				<!-- 右侧内容 -->
-				<scroll-view scroll-y class="right-content" :scroll-top="scrollTop" @scroll="onScroll"
-					scroll-with-animation>
-					<view v-for="(item, index) in main_coverage" :key="index" class="right-category"
-						:id="`category-${index}`">
-						<view class="category-title">{{ item.name }}</view>
-						<view class="child-grid">
-							<view v-for="(citem, cindex) in item.children" :key="cindex" class="child-item"
-								@tap="handleChildItemTap(citem)">
-								<view class="child-content">
-									<image :src="`${baseLink}/img/${citem.icon}`" class="child-icon" />
-									<text class="child-text">{{ citem.name }}</text>
+					<!-- 右侧内容 -->
+					<scroll-view scroll-y class="right-content" :scroll-top="scrollTop" @scroll="onScroll"
+						scroll-with-animation>
+						<view v-for="(item, index) in main_coverage" :key="index" class="right-category"
+							:id="`category-${index}`">
+							<view class="category-title">{{ item.name }}</view>
+							<view class="child-grid">
+								<view v-for="(citem, cindex) in item.children" :key="cindex" class="child-item"
+									@tap="handleChildItemTap(citem)">
+									<view class="child-content">
+										<image :src="`${baseLink}/img/${citem.icon}`" class="child-icon" />
+										<text class="child-text">{{ citem.name }}</text>
+									</view>
 								</view>
 							</view>
 						</view>
-					</view>
-				</scroll-view>
+					</scroll-view>
+				</block>
 			</view>
 		</view>
 		<!-- 底部tabr -->
@@ -370,6 +378,7 @@
 						icon: item.icon ?
 							`${this.baseLink}/img/${item.icon}` : DEFAULT_MENU_ICON
 					}));
+					this.currentQuick = menuItems[0]?.id
 				} catch (error) {
 					console.error('[Menu] 获取失败:', error);
 					uni.showToast({

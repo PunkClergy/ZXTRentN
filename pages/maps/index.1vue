@@ -1,0 +1,49 @@
+<template>
+  <view>
+    <view>google Map</view>
+    <view id="map" style="height: 100vh;"></view>
+ </view>
+</template>
+<script>
+import { Loader } from "@googlemaps/js-api-loader";
+const loader = new Loader({
+	// google服务的KEY
+	apiKey: "AIzaSyDhbwKKjOrtygKkBwDhLwPQ_OAg2oArLv4",
+	version: "weekly",
+	libraries: ["places"]
+});
+export default {
+  data() { 
+    return {}
+  },
+  onLoad() {
+		this.initMap()
+  },
+  methods:{
+	    initMap() {
+		  loader
+		    .load()
+		    .then((google) => {
+		      const map = new google.maps.Map(
+						document.getElementById("map"),
+		        {
+							// 地图打开时的中心点位，根据自己需求自行更改
+		          center: { lat: 1.3553976, lng: 103.867750 },
+							// 地图缩放参数
+		          zoom: 12,
+							// 最大缩放参数
+		        	maxZoom: 18,
+							// 最小缩放参数
+		        	minZoom: 4,
+							// 禁用默认UI
+		          disableDefaultUI: true
+		        }
+		      )
+		    })
+		    .catch((e) => {
+		      console.log(e)
+		    })
+		},
+  },
+}
+</script>

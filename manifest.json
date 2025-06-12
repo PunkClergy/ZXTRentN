@@ -3,6 +3,7 @@
     "appid" : "__UNI__0192300",
     "description" : "",
     "versionName" : "1.0.2",
+    "package" : "com2.example.myapp",
     "versionCode" : "100",
     "transformPx" : false,
     "app-plus" : {
@@ -16,12 +17,15 @@
             "autoclose" : true,
             "delay" : 0
         },
-        "modules" : {},
+        "modules" : {
+            "Maps" : {}
+        },
         /* 模块配置 */
         "distribute" : {
             /* 应用发布信息 */
             "android" : {
                 "networkSecurityConfig" : true,
+                "package" : "com.example.myapp",
                 /* android打包配置 */
                 "permissions" : [
                     "<uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\"/>",
@@ -46,7 +50,14 @@
                 "dSYMs" : false
             },
             /* ios打包配置 */
-            "sdkConfigs" : {}
+            "sdkConfigs" : {
+                "maps" : {
+                    "google" : {
+                        "APIKey_ios" : "AIzaSyDhbwKKjOrtygKkBwDhLwPQ_OAg2oArLv4",
+                        "APIKey_android" : "AIzaSyDhbwKKjOrtygKkBwDhLwPQ_OAg2oArLv4"
+                    }
+                }
+            }
         }
     },
     /* SDK配置 */
@@ -60,5 +71,13 @@
         },
         "usingComponents" : true
     },
-    "vueVersion" : "3"
+    "vueVersion" : "3",
+    "h5" : {
+        "router" : {
+            "base" : "/img/",
+            "mode" : "hash"
+        }
+    }
 }
+/* android打包配置 *//* ios打包配置 */
+
