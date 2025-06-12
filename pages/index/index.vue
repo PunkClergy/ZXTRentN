@@ -446,7 +446,7 @@
 				console.log('子项点击:', item);
 				// 这里添加实际跳转逻辑
 				uni.navigateTo({
-					url: '/pages/carRental/vehicleList/index',
+					url: '/pages/maps/index',
 					success: () => {
 						console.log('跳转成功');
 					},

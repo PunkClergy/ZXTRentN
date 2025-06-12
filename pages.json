@@ -12,6 +12,12 @@
 			}
 		},
 		{
+			"path": "pages/maps/index",
+			"style": {
+				"navigationBarTitleText": "车辆清单MCCK设备绑定"
+			}
+		},
+		{
 			"path": "pages/login/login",
 			"style": {
 				"navigationBarTitleText": "登录"
