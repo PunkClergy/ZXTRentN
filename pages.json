@@ -1,41 +1,40 @@
 {
 	"pages": [{
-			"path": "pages/index/index",
-			"style": {
-				"navigationBarTitleText": "首页"
-			}
+			"path": "pages/index/index" //首页
 		},
 		{
-			"path": "pages/carRental/vehicleList/index",
-			"style": {
-				"navigationBarTitleText": "车辆清单MCCK设备绑定"
-			}
+			"path": "pages/carRental/vehicleList/index" //车辆清单MCCK设备绑定
+		},
+
+		{
+			"path": "pages/system/account/transfer/index" //移交管理员
+		},
+		{
+			"path": "pages/system/role/roleList/index" //角色管理
+		},
+		{
+			"path": "pages/system/role/reserve/index" //预设角色-分离
+		},
+
+		{
+			"path": "pages/login/login" //登录
+		},
+		{
+			"path": "pages/register/register" //注册
 		},
 		{
 			"path": "pages/maps/index",
 			"style": {
-				"navigationBarTitleText": "车辆清单MCCK设备绑定"
-			}
-		},
-		{
-			"path": "pages/login/login",
-			"style": {
-				"navigationBarTitleText": "登录"
-			}
-		},
-		{
-			"path": "pages/register/register",
-			"style": {
-				"navigationBarTitleText": "注册"
+				"navigationBarTitleText": "车辆清单MCCK设备绑定测试用"
 			}
 		}
 	],
-	  "tabBar": {
-	    "list": [{
-	      "pagePath": "pages/index/index",
-	      "text": "首页"
-	    }]
-	  },
+	"tabBar": {
+		"list": [{
+			"pagePath": "pages/index/index",
+			"text": "首页"
+		}]
+	},
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationStyle": "custom",
@@ -45,6 +44,9 @@
 		"backgroundColor": "#F8F8F8",
 		"app-plus": {
 			"background": "#efeff4"
+		},
+		"usingComponents": {
+			"ly-tree-node": "/components/ly-tree/ly-tree-node"
 		}
 	}
 

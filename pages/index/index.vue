@@ -452,10 +452,10 @@
 
 			// 子项点击处理
 			handleChildItemTap(item) {
-				console.log('子项点击:', item);
+				console.log('子项点击:', item.path);
 				// 这里添加实际跳转逻辑
 				uni.navigateTo({
-					url: '/pages/maps/index',
+					url: item.path,
 					success: () => {
 						console.log('跳转成功');
 					},

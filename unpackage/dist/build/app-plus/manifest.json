@@ -17,6 +17,9 @@
     "url": ""
   },
   "permissions": {
+    "Maps": {
+      "coordType": "gcj02"
+    },
     "UniNView": {
       "description": "UniNView原生渲染"
     }
@@ -43,6 +46,7 @@
     "distribute": {
       "google": {
         "networkSecurityConfig": true,
+        "package": "com.example.myapp",
         "permissions": [
           "<uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\"/>",
           "<uses-permission android:name=\"android.permission.MOUNT_UNMOUNT_FILESYSTEMS\"/>",
@@ -66,6 +70,12 @@
         "dSYMs": false
       },
       "plugins": {
+        "maps": {
+          "google": {
+            "APIKey_ios": "AIzaSyDhbwKKjOrtygKkBwDhLwPQ_OAg2oArLv4",
+            "APIKey_android": "AIzaSyDhbwKKjOrtygKkBwDhLwPQ_OAg2oArLv4"
+          }
+        },
         "audio": {
           "mp3": {
             "description": "Android平台录音支持MP3格式文件"
