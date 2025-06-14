@@ -27,7 +27,8 @@
 								<view class="head-right">
 									<image src="/static/public/_edit.png" :data-item="item" @tap="handleEdit(item)" />
 									<image src="/static/public/SetUp.png" :data-item="item" @tap="handleSetUp(item)" />
-									<image src="/static/public/_delete.png" :data-id="item.id" @tap="handleDelete" />
+									<image src="/static/public/_delete.png" :data-id="item.id"
+										@tap="handleDelete(item)" />
 								</view>
 							</view>
 
@@ -89,9 +90,11 @@
 		u_getCarList,
 		u_addOrUpdateCar,
 		u_roleapiList,
-		u_getMenuTree
+		u_getMenuTree,
+		u_roleapidel
 	} from '@/api'
 	import CustomNavBar from "@/components/custom-header/index.vue";
+
 	import LyTree from '@/components/ly-tree/ly-tree.vue'
 	import {
 		info_screen
@@ -220,7 +223,22 @@
 
 			// 确认修改
 			async handleSubmit() {},
+			// 删除角色
+			async handleDelete(evt) {
+				console.log(evt)
+				try {
+					const res = await u_roleapidel({
+						id: evt?.id
+					});
+					this.$nextTick(() => {
+						this.initialRoleList();
+					});
 
+				} catch (error) {
+					console.log('删除失败')
+				}
+
+			}
 		}
 	};
 </script>
