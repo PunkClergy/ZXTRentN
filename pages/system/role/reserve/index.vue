@@ -26,7 +26,8 @@
 								</view>
 								<view class="head-right">
 									<image src="/static/public/_edit.png" :data-item="item" @tap="handleEdit(item)" />
-									<image src="/static/public/_delete.png" :data-id="item.id" @tap="handleDelete" />
+									<image src="/static/public/_delete.png" :data-id="item.id"
+										@tap="handleDelete(item)" />
 								</view>
 							</view>
 
@@ -67,6 +68,56 @@
 
 			</block>
 		</view>
+		<!-- 一键操作按钮 -->
+		<view class="levitation-button" @tap="handleJumpInfo">
+			<text>新增人员</text>
+		</view>
+
+		<view class="modal-mask" v-if="c_send_key_show_momal" @tap="handleHideSengKeyModal"></view>
+		<view class="modal-base-map" v-if="c_send_key_show_momal">
+			<form @submit="handleFormSubmit">
+				<view class="modal-container">
+					<view class="modal-container-head">
+						<text>{{ user_text }}人员</text>
+						<image src="/static/public/close.png" @tap="handleHideSengKeyModal" />
+					</view>
+					<view class="modal-container-middle">
+						<view class="middle-form-item">
+							<label>账号</label>
+							<view class="modal-form-region">
+								<input placeholder="请输入账号" :value="g_uesr_details.username" name="username"
+									style="text-align: right; font-size: 28rpx" />
+							</view>
+						</view>
+						<view class="middle-form-item">
+							<label>密码</label>
+							<view class="modal-form-region">
+								<input placeholder="请输入密码" :value="g_uesr_details.password" name="password"
+									style="text-align: right; font-size: 28rpx" />
+							</view>
+						</view>
+						<view class="middle-form-item">
+							<label>姓名</label>
+							<view class="modal-form-region">
+								<input placeholder="请输入姓名" :value="g_uesr_details.realname" name="realname"
+									style="text-align: right; font-size: 28rpx" />
+							</view>
+						</view>
+						<view class="middle-form-item">
+							<label>手机号</label>
+							<view class="modal-form-region">
+								<input placeholder="请输入手机号" :value="g_uesr_details.mobile" name="mobile"
+									style="text-align: right; font-size: 28rpx" />
+							</view>
+						</view>
+					</view>
+					<view class="modal-container-footer">
+						<button formType="submit">确认</button>
+					</view>
+				</view>
+			</form>
+		</view>
+
 	</view>
 </template>
 
@@ -74,7 +125,9 @@
 	import {
 		u_roleapigetRole,
 		u_childUserList,
-		u_getMenuTree
+		u_getMenuTree,
+		u_addOrUpdateChildUser,
+		u_delChildUser
 	} from '@/api'
 	import CustomNavBar from "@/components/custom-header/index.vue";
 	import LyTree from '@/components/ly-tree/ly-tree.vue'
@@ -103,7 +156,15 @@
 
 					}
 				},
-				treeData: []
+				treeData: [],
+				c_send_key_show_momal: false,
+				user_text: '新增',
+				g_uesr_details: {
+					username: '',
+					password: '',
+					realname: '',
+					mobile: ''
+				},
 			};
 		},
 		onLoad(options) {
@@ -155,6 +216,9 @@
 			// 编辑角色信息
 			handleEdit(evt) {
 				// 此处是修改人员
+				this.g_uesr_details = evt
+				this.c_send_key_show_momal = true
+				this.user_text = "修改"
 			},
 
 			// 切换标签页
@@ -182,6 +246,7 @@
 						roleName: evt,
 						isAutoCreate: 1
 					});
+					this.role_id = res?.content?.id
 					this.$nextTick(() => {
 						this.initChildUser(res?.content?.id);
 						this.initGetMenuTree(res?.content?.id)
@@ -206,9 +271,70 @@
 				}
 			},
 
-
 			// 确认修改
 			async handleSubmit() {},
+			// 点击出现弹窗
+			handleJumpInfo() {
+				this.c_send_key_show_momal = true
+			},
+			// 点击关闭弹窗
+			handleHideSengKeyModal() {
+				this.c_send_key_show_momal = false
+				this.g_uesr_details = {}
+				this.user_text = "新增"
+			},
+			// 删除人员
+			async handleDelete(evt) {
+
+				try {
+					const res = await u_delChildUser({
+						id: evt?.id
+					});
+					this.$nextTick(() => {
+						this.initChildUser(this.role_id);
+					});
+
+				} catch (error) {
+					console.error('删除失败:', error);
+				}
+			},
+			// 新增人员
+			async handleFormSubmit(evt) {
+				const temp = {
+					...evt.detail.value,
+					roleId: this.role_id
+				}
+				console.log((temp))
+				try {
+					const res = await u_addOrUpdateChildUser(temp);
+					console.log(res)
+					if (res?.code == 1000) {
+						uni.showToast({
+							title: res.msg, // 提示的内容
+							icon: 'none', // 图标类型，可选值有"success"、"loading"、"none"
+							duration: 2000 // 提示的持续时间，单位为毫秒
+						});
+						this.c_send_key_show_momal = false
+						this.g_uesr_details = {
+							username: '',
+							password: '',
+							realname: '',
+							mobile: ''
+						}
+						this.$nextTick(() => {
+							this.initChildUser(this.role_id);
+						});
+					} else {
+						uni.showToast({
+							title: res.msg, // 提示的内容
+							icon: 'none', // 图标类型，可选值有"success"、"loading"、"none"
+							duration: 2000 // 提示的持续时间，单位为毫秒
+						});
+					}
+				} catch (error) {
+					console.error('获取角色列表失败:', error);
+				}
+			}
 
 		}
 	};
