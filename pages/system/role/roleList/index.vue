@@ -91,7 +91,8 @@
 		u_addOrUpdateCar,
 		u_roleapiList,
 		u_getMenuTree,
-		u_roleapidel
+		u_roleapidel,
+		u_roleapiaddOrUpdate
 	} from '@/api'
 	import CustomNavBar from "@/components/custom-header/index.vue";
 
@@ -222,7 +223,28 @@
 			},
 
 			// 确认修改
-			async handleSubmit() {},
+			async handleSubmit() {
+				console.log(this.params)
+				const temp = {
+					id: this.params?.id || '',
+					name: this.params?.name || '',
+					bak: this.params?.bak || ''
+
+				}
+				try {
+					const res = await u_roleapiaddOrUpdate({
+						...temp
+					});
+					this.g_activeTab = 1
+					this.$nextTick(() => {
+						// 设置权限内容？？？？？？？？
+						this.initialRoleList();
+					});
+
+				} catch (error) {
+					console.log('新增失败')
+				}
+			},
 			// 删除角色
 			async handleDelete(evt) {
 				console.log(evt)

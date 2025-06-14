@@ -8,4 +8,5 @@ export const u_roleapigetRole = (data) => http.get('/roleapi/getRole', data) //�
 export const u_getMenuTree = (data) => http.get('/roleapi/getMenuTree', data) //权限树
 export const u_addOrUpdateChildUser = (data) => http.postFormData('/accountapi/addOrUpdateChildUser', data) //新增人员
 export const u_delChildUser = (data) => http.get('/accountapi/delChildUser', data) // 删除人员
-export const u_roleapidel = (data) => http.get('/roleapi/del', data) // 删除人员
+export const u_roleapidel = (data) => http.get('/roleapi/del', data) // 删除角色
+export const u_roleapiaddOrUpdate = (data) => http.postFormData('/roleapi/addOrUpdate', data) // 角色新增
