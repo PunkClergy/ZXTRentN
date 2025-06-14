@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport"
+			content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=0" />
+		<link href="http://fonts.googleapis.com/css?family=Roboto:300" rel="stylesheet" type="text/css">
+		<title>谷歌地图-初始化地图</title>
+		<link rel="stylesheet" type="text/css" href="./css/index.css" />
+		<script src="./js/lib/toast.js"></script>
+	</head>
+	<body>
+		<!-- 地图 -->
+		<div id="map"></div>
+		<div style="position: absolute;bottom: 100px;">
+			<div class='btn' id="btn">开始运动</div>
+		</div>
+		
+	</body>
+	<script type="text/javascript" src="https://js.cdn.aliyun.dcloud.net.cn/dev/uni-app/uni.webview.1.5.2.js"></script>
+	<script
+		src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA-1O3BpXj7BKBt8oJeMpzXy0DKxKVpPx4&libraries=places&callback=initMap"
+		async defer></script>
+
+	<script src="./js/homePage.js"></script>
+</html>
