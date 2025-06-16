@@ -21,12 +21,6 @@
 		},
 		{
 			"path": "pages/register/register" //注册
-		},
-		{
-			"path": "pages/maps/index",
-			"style": {
-				"navigationBarTitleText": "车辆清单MCCK设备绑定测试用"
-			}
 		}
 	],
 	"tabBar": {
