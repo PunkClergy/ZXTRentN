@@ -3,7 +3,7 @@
   <view class="launch-screen">
     <image 
       class="logo" 
-      src="/static/logo.png" 
+      src="/static/public/logo.png" 
       mode="aspectFit"
     />
     <view class="text-area">
