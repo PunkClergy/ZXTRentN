@@ -21,6 +21,12 @@
 		},
 		{
 			"path": "pages/register/register" //注册
+		},
+		{
+			"path": "pages/GPSTrajectory/GPSTrajectory",
+			"style": {
+				"navigationBarTitleText": ""
+			}
 		}
 	],
 	"tabBar": {

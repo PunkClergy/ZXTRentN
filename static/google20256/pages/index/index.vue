@@ -1,7 +1,7 @@
 <template>
 	<view class="content">
 		<image class="logo" src="/static/logo.png"></image>
-		<view class="text-area">
+		<view class="text-area" @tap="handleJump">
 			<text class="title">{{title}}</text>
 		</view>
 	</view>
@@ -18,7 +18,11 @@
 
 		},
 		methods: {
-
+			handleJump(){
+				uni.navigateTo({
+					url:'/pages/GPSTrajectory/GPSTrajectory'
+				})
+			}
 		}
 	}
 </script>

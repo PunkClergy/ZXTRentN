@@ -10,18 +10,18 @@
 		data() {
 			return {
 				webUrl: "",
-				viewportHeight: 932, // 页面高度
+				viewportHeight: 332, // 页面高度
 			};
 		},
 		onLoad() {
-			this.webUrl = '/hybrid/html/maps/homePgae.html?nowTime=' +
+			this.webUrl = '/hybrid/html/homePgae.html?nowTime=' +
 				Date
 				.now();
 		},
-		methods:{
-			getMessage(e){
+		methods: {
+			getMessage(e) {
 				console.log(e)
-				if(ssss='1'){
+				if (ssss = '1') {
 					// 接口1
 				}
 			}

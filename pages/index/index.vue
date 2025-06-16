@@ -453,6 +453,10 @@
 			// 子项点击处理
 			handleChildItemTap(item) {
 				console.log('子项点击:', item.path);
+				uni.navigateTo({
+					url:'/pages/GPSTrajectory/GPSTrajectory'
+				})
+				return
 				// 这里添加实际跳转逻辑
 				uni.navigateTo({
 					url: item.path,
