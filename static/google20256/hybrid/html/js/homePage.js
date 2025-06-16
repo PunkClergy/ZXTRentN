@@ -9,7 +9,7 @@ var meMarker = ''; //个人位置标记点
 var startMarker = '';
 var endMarker = '';
 var dis = 0; //目标距离
-var img = "https://k1sw.wiselink.net.cn/img/nav/desk@2x.png"
+var img = "https://k3a.wiselink.net.cn/img/app/currentLocation.png"
 var markers = []
 var lastClickedMarker = ""; //记录当前点击的marker
 let openInfoWindow; //信息窗口
@@ -257,7 +257,7 @@ function setTimeoutInfoWindowClick(clickIndex) {
 }
 // 点击归还车辆
 function ListenclickStartRun() {
-	document.getElementById('btn').addEventListener('click', function() {
+	document.getElementById('returning-vehicles').addEventListener('click', function() {
 		uni.postMessage({
 			data: {
 				source: 2,
