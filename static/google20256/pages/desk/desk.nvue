@@ -15,6 +15,7 @@
 				去登录
 			</view>
 		</view>
+
 		<!-- 轮播图 -->
 		<view class="content-container">
 			<swiper class="swiper" :autoplay="true" :interval="3000" :duration="500">
@@ -24,6 +25,7 @@
 				</swiper-item>
 			</swiper>
 		</view>
+
 		<!-- 快捷菜单区域 -->
 		<view class="quick-container">
 			<swiper class="quick-swiper" :autoplay="true" :interval="3000" :duration="500">
@@ -42,10 +44,43 @@
 			</swiper>
 		</view>
 
-		<!-- 地图内容 -->
-		<view class="maps" style="margin: 0 10rpx;background-color: aqua;">
-			<web-view ref="webview" style="background-color: #fafafa;" :style="{ height: viewportHeight + 'px' }"
-				@onPostMessage="handlePostMessage" :src="webUrlWithTimestamp"></web-view>
+		<!-- 主内容区域 -->
+		<view class="main-content" :style="{ height: contentHeight + 'px' }">
+			<block v-if="currentQuick==540">
+				<web-view ref="webview" @onPostMessage="handlePostMessage" :src="webUrlWithTimestamp"
+					:style="{ height: contentHeight + 'px' }">
+				</web-view>
+			</block>
+			<block v-else>
+				<view class="main-content-container" :style="{ height: contentHeight + 'px' }">
+					<!-- 左侧导航 -->
+					<scroll-view scroll-y class="left-nav" :style="{ height: contentHeight + 'px' }">
+						<view v-for="(item, index) in main_coverage" :key="index" class="category-item"
+							:class="{ active: activeIndex === index }" @tap="switchCategory(index)">
+							{{ item.name }}
+						</view>
+					</scroll-view>
+
+					<!-- 右侧内容 -->
+					<scroll-view scroll-y class="right-content" :scroll-top="scrollTop" @scroll="onScroll"
+						scroll-with-animation :style="{ height: contentHeight + 'px' }">
+						<view v-for="(item, index) in main_coverage" :key="index" class="right-category"
+							:id="`category-${index}`" :data-index="index">
+							<view class="category-title">{{ item.name }}</view>
+							<view class="child-grid">
+								<view v-for="(citem, cindex) in item.children" :key="cindex"
+									@tap="handleChildItemTap(citem)" style="width: 150rpx;margin-left: 2rpx;">
+									<view class="child-content">
+										<image :src="`${baseLink}/img/${citem.icon}`" class="child-icon" />
+										<text class="child-text">{{ citem.name }}</text>
+									</view>
+								</view>
+								<!-- 子菜单项 -->
+							</view>
+						</view>
+					</scroll-view>
+				</view>
+			</block>
 		</view>
 	</view>
 </template>
@@ -57,25 +92,34 @@
 	import {
 		u_logo,
 		u_bannerlist,
-		u_midMenulist
+		u_midMenulist,
+		u_rightMenulist
 	} from '@/api'
 	import 'url-search-params-polyfill';
 	const DEFAULT_MENU_ICON = '/static/public/default-icon.png';
 	const MENU_ITEMS_PER_PAGE = 5; // 每页菜单项数量
+
 	export default {
 		data() {
 			return {
 				screenInfo: {}, // 屏幕信息对象
 				logo: '', // Logo图片地址
 				baseLink: 'https://k1sw.wiselink.net.cn', // 基础域名
-				viewportHeight: 332, // 页面高度
 				isLoading: false,
 				nowTimestamp: Date.now(), // 缓存时间戳
-				// 轮播图数据/（示例数据）
+				// 轮播图数据
 				bannerList: [],
 				menuList: [], // 菜单原始数据
 				imageErrors: new Set(), // 图片加载错误记录
 				iconErrors: new Set(), // 图标加载错误记录
+				contentHeight: 0, // 动态计算内容高度
+				currentQuick: '', //当前点击快捷入口ID
+				main_coverage: [], // 主内容区域数据
+				scrollTop: 0, // 右侧滚动位置
+				activeIndex: 0, // 当前激活的分类索引
+				// 新增变量
+				categoryPositions: [], // 存储分类位置信息
+				scrollTimer: null, // 滚动防抖计时器
 			}
 		},
 		computed: {
@@ -162,7 +206,8 @@
 			async initialScreenInfo() {
 				try {
 					this.screenInfo = await info_screen()
-					// 生产环境移除console
+					this.calculateContentHeight(); // 获取屏幕信息后计算内容高度
+
 					if (process.env.NODE_ENV === 'development') {
 						console.log('Screen info:', this.screenInfo)
 					}
@@ -173,6 +218,32 @@
 						icon: 'none'
 					})
 				}
+			},
+
+			// 计算内容高度
+			calculateContentHeight() {
+				if (!this.screenInfo.screenHeight) return;
+
+				// 将rpx转换为px的辅助函数
+				const rpx2px = (rpx) => {
+					return (rpx * this.screenInfo.screenWidth) / 750;
+				};
+
+				// 计算各组件高度
+				const navBarHeight = this.navbarTotalHeight;
+				const navBarPadding = rpx2px(40); // 20rpx*2
+				const bannerHeight = 150; // 轮播图固定高度(px)
+				const quickMenuHeight = rpx2px(200); // 快捷菜单高度(rpx转px)
+
+				// 计算剩余高度
+				const remainingHeight = this.screenInfo.screenHeight -
+					navBarHeight -
+					navBarPadding -
+					bannerHeight -
+					quickMenuHeight;
+
+				// 设置内容高度（不小于0）
+				this.contentHeight = Math.max(remainingHeight, 0);
 			},
 
 			// 初始化应用Logo
@@ -195,16 +266,15 @@
 				if (process.env.NODE_ENV === 'development') {
 					console.log('Received post message:', e)
 				}
-
-				// 根据实际业务逻辑处理消息
-				// 示例：if (e.detail.data?.type === 'specific_event') { ... }
 			},
+
 			// 获取安全的菜单图标URL
 			getMenuIconUrl(iconPath) {
 				return (!iconPath || this.iconErrors.has(iconPath)) ?
 					DEFAULT_MENU_ICON :
 					iconPath;
 			},
+
 			// 初始化轮播图数据
 			async initialBannerList() {
 				this.isLoading = true;
@@ -226,6 +296,7 @@
 					this.isLoading = false;
 				}
 			},
+
 			// 初始化快捷菜单数据
 			async initialMenuList() {
 				this.isLoading = true;
@@ -244,7 +315,7 @@
 						icon: item.icon ?
 							`${this.baseLink}/img/${item.icon}` : DEFAULT_MENU_ICON
 					}));
-					this.currentQuick = menuItems[0]?.id
+					this.currentQuick = menuItems[0]?.id || '';
 				} catch (error) {
 					console.error('[Menu] 获取失败:', error);
 					uni.showToast({
@@ -256,42 +327,216 @@
 					this.isLoading = false;
 				}
 			},
+
 			// 获取安全的轮播图URL
 			getBannerUrl(imgPath) {
 				return imgPath ?
 					`${this.baseLink}/img/${imgPath.trim()}` :
 					'/static/default-banner.jpg';
 			},
-			getPageItems(pageIndex) {
-				const start = pageIndex * 5;
-				const end = start + 5;
-				return this.menuData.slice(start, end);
-			}
+
+
+
+			// 处理菜单图标错误
+			handleMenuIconError(id) {
+				this.iconErrors.add(id);
+			},
+
+			// 处理轮播图错误
+			handleSwiperError(id) {
+				this.imageErrors.add(id);
+			},
+
+			// 轮播图点击
+			handleSwiperClick(item) {
+				if (item.url) {
+					uni.navigateTo({
+						url: item.url
+					});
+				}
+			},
+
+			// 子菜单项点击
+			handleChildItemTap(item) {
+				if (item.url) {
+					uni.navigateTo({
+						url: item.url
+					});
+				}
+			},
+
+		
+
+			 // 切换分类 - 修复定位问题
+			switchCategory(index) {
+				this.activeIndex = index;
+
+				// 确保DOM更新完成
+				this.$nextTick(() => {
+					// 使用scroll-into-view实现精准定位
+					this.scrollTop = 0; // 重置滚动位置
+					this.$nextTick(() => {
+						this.currentViewId = `category-${index}`;
+						this.scrollTop = -1; // 强制刷新
+						this.$nextTick(() => {
+							this.scrollTop = 0;
+						});
+					});
+
+					// 备用方案：使用节点查询
+					this.scrollToCategory(index);
+				});
+			},
+
+			// 精准滚动到指定分类
+			scrollToCategory(index) {
+				const query = uni.createSelectorQuery().in(this);
+				query.select(`#category-${index}`).boundingClientRect().exec(res => {
+					if (res && res[0]) {
+						const rect = res[0];
+						if (rect) {
+							// 计算正确的滚动位置
+							const currentScrollTop = this.scrollTop;
+							const targetPosition = rect.top + currentScrollTop;
+
+							// 设置滚动位置（添加偏移量避免被标题栏遮挡）
+							this.scrollTop = targetPosition - 50;
+						}
+					}
+				});
+			},
+
+			// 滚动处理 - 优化性能
+			onScroll(e) {
+				// 防抖处理
+				if (this.scrollTimer) {
+					clearTimeout(this.scrollTimer);
+				}
+
+				this.scrollTimer = setTimeout(() => {
+					const scrollTop = e.detail.scrollTop;
+					this.updateActiveCategory(scrollTop);
+				}, 50);
+			},
+
+			// 更新激活分类 - 优化算法
+			updateActiveCategory(scrollTop) {
+				// 初始化位置信息
+				if (this.categoryPositions.length === 0) {
+					this.initCategoryPositions();
+				}
+
+				// 查找当前激活的分类
+				for (let i = 0; i < this.categoryPositions.length; i++) {
+					const current = this.categoryPositions[i];
+					const next = this.categoryPositions[i + 1];
+
+					if (scrollTop >= current.top &&
+						(!next || scrollTop < next.top)) {
+						if (this.activeIndex !== i) {
+							this.activeIndex = i;
+						}
+						break;
+					}
+				}
+			},
+
+			// 初始化分类位置信息
+			initCategoryPositions() {
+				this.categoryPositions = [];
+				const promises = [];
+
+				this.main_coverage.forEach((_, index) => {
+					const query = uni.createSelectorQuery().in(this);
+					promises.push(new Promise(resolve => {
+						query.select(`#category-${index}`).boundingClientRect().exec(res => {
+							if (res && res[0]) {
+								this.categoryPositions[index] = {
+									top: res[0].top,
+									height: res[0].height
+								};
+							}
+							resolve();
+						});
+					}));
+				});
+
+				// 等待所有位置查询完成
+				Promise.all(promises).then(() => {
+					// 转换为绝对位置
+					let currentTop = 0;
+					this.categoryPositions = this.categoryPositions.map(pos => {
+						const result = {
+							top: currentTop,
+							height: pos.height
+						};
+						currentTop += pos.height;
+						return result;
+					});
+				});
+			},
+
+			// 菜单项点击处理 - 增加位置初始化
+			async handleMenuItemTap(item) {
+				try {
+					const response = await u_rightMenulist({
+						menuId: item?.id,
+						isDir: 1
+					});
+
+					this.main_coverage = response?.content || [];
+					await this.$nextTick();
+
+					// 重置位置信息
+					this.categoryPositions = [];
+					this.activeIndex = 0;
+					this.scrollTop = 0;
+					this.currentQuick = item?.id || '';
+
+					// 初始化位置信息
+					this.$nextTick(() => {
+						setTimeout(() => this.initCategoryPositions(), 300);
+					});
+				} catch (error) {
+					console.error('[MainCoverage] 获取失败:', error);
+					uni.showToast({
+						title: '内容加载失败',
+						icon: 'none'
+					});
+				}
+			},
 		},
 
 		// 生命周期钩子
 		async onShow() {
-			this.isLoading = true
+			this.isLoading = true;
 			uni.hideTabBar({
 				animation: true
-			}) // 移出计算属性
+			});
 
 			try {
-				// 并行初始化任务
 				await Promise.allSettled([
 					this.initialScreenInfo(),
 					this.initialLogo(),
 					this.initialBannerList(),
 					this.initialMenuList()
-				])
+				]);
 
-				// 更新时间戳确保每次进入都刷新webview
-				this.nowTimestamp = Date.now()
+				this.nowTimestamp = Date.now();
 			} catch (error) {
-				console.error('初始化失败:', error)
+				console.error('初始化失败:', error);
 			} finally {
-				this.isLoading = false
+				this.isLoading = false;
 			}
+		},
+
+		onReady() {
+			this.calculateContentHeight();
+		},
+
+		onResize() {
+			// 屏幕尺寸变化时重新计算高度
+			this.calculateContentHeight();
 		}
 	}
 </script>
@@ -367,7 +612,6 @@
 		height: 200rpx;
 	}
 
-
 	/* 菜单网格布局 */
 	.menu-grid {
 		display: flex;
@@ -394,5 +638,96 @@
 	/* 文本样式 */
 	.menu-text {
 		font-size: 12px;
+	}
+
+	/* 主内容容器 - 关键修改 */
+	.main-content {
+		flex: 1;
+		margin: 0 10rpx;
+		overflow: hidden;
+	}
+
+	/* 地图容器 */
+	.map-container {
+		height: 100%;
+	}
+
+	/* 主内容区域 */
+	.main-content-container {
+		width: 750rpx;
+		height: 100%;
+		display: flex;
+		flex-direction: row;
+	}
+
+	.left-nav {
+		width: 225rpx;
+		background-color: #f5f5f5;
+		height: 100%;
+	}
+
+	.right-content {
+		flex: 1;
+		padding: 20rpx;
+		height: 100%;
+	}
+
+	.category-item {
+		padding: 24rpx 20rpx;
+		font-size: 28rpx;
+		color: #666;
+		text-align: center;
+		position: relative;
+	}
+
+	.category-item.active {
+		background-color: #fff;
+		color: #007AFF;
+		font-weight: bold;
+	}
+
+
+	.right-category {
+		padding-bottom: 30rpx;
+		margin-bottom: 20rpx;
+	}
+
+	.category-title {
+		font-size: 30rpx;
+		font-weight: bold;
+		margin-bottom: 24rpx;
+		padding-bottom: 12rpx;
+		border-bottom: 1rpx solid #eee;
+		color: #000;
+	}
+
+	.child-grid {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: flex-start;
+	}
+
+	.child-content {
+
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.child-content:active {
+		opacity: 0.7;
+	}
+
+	.child-icon {
+		width: 60rpx;
+		height: 60rpx;
+	}
+
+	.child-text {
+		font-size: 26rpx;
+		margin-top: 10rpx;
+		color: #333;
 	}
 </style>
