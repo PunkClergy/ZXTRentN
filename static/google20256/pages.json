@@ -5,7 +5,9 @@
 			"style": {
 				"navigationBarTitleText": ""
 			}
-		}, {
+		}, 	{
+			"path": "pages/carRental/vehicleList/index" //车辆清单MCCK设备绑定
+		},{
 			"path": "pages/GPSTrajectory/GPSTrajectory",
 			"style": {
 				"navigationBarTitleText": ""

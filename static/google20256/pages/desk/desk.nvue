@@ -69,8 +69,8 @@
 							<view class="category-title">{{ item.name }}</view>
 							<view class="child-grid">
 								<view v-for="(citem, cindex) in item.children" :key="cindex"
-									@tap="handleChildItemTap(citem)" style="width: 150rpx;margin-left: 2rpx;">
-									<view class="child-content">
+									style="width: 150rpx;margin-left: 2rpx;">
+									<view class="child-content" @tap="handleChildItemTap(citem)" >
 										<image :src="`${baseLink}/img/${citem.icon}`" class="child-icon" />
 										<text class="child-text">{{ citem.name }}</text>
 									</view>
@@ -358,9 +358,10 @@
 
 			// 子菜单项点击
 			handleChildItemTap(item) {
-				if (item.url) {
+				console.log((item))
+				if (item.path) {
 					uni.navigateTo({
-						url: item.url
+						url: item.path
 					});
 				}
 			},

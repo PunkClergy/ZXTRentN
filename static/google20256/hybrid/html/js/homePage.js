@@ -3,7 +3,7 @@ var lngs = '';
 var elats = ''; //结束lat
 var elngs = ''; //结束lng
 
-var zoom = 15; //地图缩放比例
+var zoom = 18; //地图缩放比例
 var coords = "";
 var meMarker = ''; //个人位置标记点
 var startMarker = '';
