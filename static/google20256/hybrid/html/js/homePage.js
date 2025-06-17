@@ -1,270 +1,298 @@
-var lats = '';
-var lngs = '';
-var elats = ''; //结束lat
-var elngs = ''; //结束lng
+// 使用立即执行函数封装代码，避免全局污染
+(function() {
+	// 常量配置 - 标记图标URL
+	const MARKER_ICON = "https://k3a.wiselink.net.cn/img/app/currentLocation.png"; // 用户位置标记图标
+	const MARKER_CAR = "https://k3a.wiselink.net.cn/img/app/g_location.png"; // 车辆位置标记图标
+	const MARKER_SIZE = 50; // 用户标记的默认尺寸
+	const MARKER_CAR_SIZE = {
+		width: 17,
+		height: 36
+	}; // 车辆标记的精确尺寸
+	const DEFAULT_ZOOM = 15; // 地图默认缩放级别
 
-var zoom = 18; //地图缩放比例
-var coords = "";
-var meMarker = ''; //个人位置标记点
-var startMarker = '';
-var endMarker = '';
-var dis = 0; //目标距离
-var img = "https://k3a.wiselink.net.cn/img/app/currentLocation.png"
-var markers = []
-var lastClickedMarker = ""; //记录当前点击的marker
-let openInfoWindow; //信息窗口
+	// 状态变量 - 存储应用状态
+	let userLat = ''; // 用户/车辆纬度
+	let userLng = ''; // 用户/车辆经度
+	let mapInstance = null; // Google地图实例
+	let userMarker = null; // 用户位置标记实例
+	let infoContent = ''; // 接收到的附加信息
+	let source = ''; // 数据来源标识
+	let isMapInitialized = false; // 地图是否已初始化标志
 
-/**
- * 初始化
- * 
- */
-function initMap() {
-	if (navigator.geolocation) {
-		navigator.geolocation.getCurrentPosition(function(position) {
-			coords = {
+	// 消息处理器 - 处理从其他窗口/iframe传来的消息
+	function handleIncomingMessage(e) {
+		// 检查是否为desk类型消息
+		if (e.data.type === 'desk') {
+			// 更新接收到的信息内容
+			infoContent = e.data.payload;
+			// 更新数据来源标识
+			source = e.data.type;
 
-				lat: 39.93374, //position.coords.latitude,
-				lng: 116.372661 //position.coords.longitude
-			};
-			lats = 39.93374; //position.coords.latitude;
-			lngs = 116.372661 //position.coords.longitude
-			map = new google.maps.Map(document.getElementById('map'), {
-				zoom: zoom,
-				center: coords,
-				// mapId: MAPID,
-				animation: 'BOUNCE'
-			});
-			setMePositioning();
-			myBtn1();
-			foldLine();
-			ListenclickStartRun()
-		}, fail => {}, {
-			enableHighAccuracy: true, //高精度
-			timeout: 5000, //超时时间,以ms为单位
-			maximumAge: 24 * 60 * 60 * 1000, //位置缓存时间,以ms为单位
-		});
-	} else {
-		Toast('运您的浏览器不支持Geolocation API', 1000)
-		console.log('您的浏览器不支持Geolocation API');
-	}
-}
-/**
- * setMePositioning
- * 定位 ：显示自己当前当位置
- * 
- */
-
-function setMePositioning() {
-	meMarker = new google.maps.Marker({
-		position: {
-			lat: lats,
-			lng: lngs
-		},
-		icon: {
-			url: img,
-			scaledSize: new google.maps.Size(50, 50),
-		},
-		animation: 'BOUNCE',
-		map: map
-	});
-}
-// 当前定位点
-function myBtn1() {
-	let min = 500;
-	let max = 1000;
-	let randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
-	for (let i = 0; i < 20; i++) {
-		var locObj = {
-			lat: (lats + (Math.floor(Math.random() * 21) - 15) / randomNum) * 1,
-			lng: (lngs - (Math.floor(Math.random() * 21) - 15) / randomNum) * 1,
-			title: 123423
+			// 如果地图已初始化且收到有效位置数据
+			if (isMapInitialized && infoContent?.latitude && infoContent?.longitude) {
+				// 更新用户位置为desk数据源的位置
+				updateUserPosition(infoContent.latitude, infoContent.longitude, true);
+			}
+			toggleVisibility()
 		}
-		/**
-		 * 以下title 和 imgUrl 在這裏設置的目的是為了點擊marker標記點時 信息彈出框有數據   無此業務邏輯時  可選擇性去除該功能
-		 * 以及注釋ListeningMarkerClick 方法即可
-		 * */
-		const marker = new google.maps.Marker({
-			position: locObj,
-			title: locObj.title + '-' + i,
-			imgUrl: 'https://picsum.photos/450/450?random=' + Math.floor(Math.random() * 100),
-			icon: {
-				url: 'https://picsum.photos/450/450?random=' + Math.floor(Math.random() * 100),
-				scaledSize: new google.maps.Size(50, 50),
-			},
-			map: map
-		});
-		markers.push(marker)
-		ListeningMarkerClick(marker, i)
-		// 标记点点击事件
-		marker.addListener("click", () => {
-			Toast("点击了第" + i + "个marker标记点",
-				1000)
-
-		});
-		markerClickAnimation(marker)
 	}
-}
-// 自定义点
-function markerClickAnimation(marker) {
-	marker.addListener('click', function() {
-		if (lastClickedMarker && lastClickedMarker.getAnimation() !== null) {
-			lastClickedMarker.setAnimation(null);
-		}
-		// 设置当前点击的 Marker 动画效果
-		marker.setAnimation(google.maps.Animation.BOUNCE);
-		// 记录当前点击的 Marker
-		lastClickedMarker = marker;
-	});
-}
-// 轨迹图
-function foldLine() {
-	var locationArr = [{
-		lng: 116.403568,
-		lat: 39.973114,
-	}, {
-		lng: 116.385029,
-		lat: 39.982848,
-	}, {
-		lng: 116.383141,
-		lat: 39.962458
-	}, {
-		lng: 116.356533,
-		lat: 39.952984
-	}, {
-		lng: 116.342629,
-		lat: 39.959037
-	}, {
-		lng: 116.341427,
-		lat: 39.970746
-	}, {
-		lng: 116.314304,
-		lat: 39.971141
-	}]
-	var polylinePathPoints = locationArr;
-	// map：指定要放在哪個地圖上，如果沒有設定，可以再用 setMap 的方法把折線放到地圖裡。
-	// path：折線的路徑，使用陣列來表示，每個陣列元素是經緯度的物件，必須包含對應的經緯度座標才能繪製。
-	// icons：折線上每個座標的圖示，使用陣列來表示，如果沒有 icon 則不會有圖案顯示。
-	// strokeColor：折線線條的顏色。
-	// strokeOpacity：折線的線條透明度，0.0 ~ 1.0 之間，越接近 0 表示越透明。
-	// strokeWeight：折線的線條寬度，使用 pixel 表示。
-	// zIndex：折線的階層，數字越大在越上面。
-	// visible：是否可以看見折線，預設值 true，如果設定 false 就看不見折線。
-	// clickable：是否可以點擊折線，預設值 true，如果設為 false 則不能點擊。
-	// draggable：是否可以拖曳折線，預設值為 false，如果設為 true，則可以把整個線段形狀拖曳到別的地方 ( 如果是要個別修改折線上的點，可以使用 editable )。
-	// editable：是否可以編輯折線上的每個點，預設值為 false，如果設為 true，在折線上就會出現可以拖曳的圓點標記，透過滑鼠就可以更改每個點的位置。
-	// geodesic：是否要依照「地球弧度」繪製折線，預設值為 flase，表示一律採「直線」顯示，若設定為 true，在地圖縮小到一定比例， 類似可以在同個畫面看到完整的台灣，就會看到折線變成「弧線」，因為地球本身是橢圓形，所以如果有看過飛機航線就知道，航線都會是弧線顯示 ( 在地球表面，最短的距離不是直線，是弧線 )。
 
-	var polylinePath = new google.maps.Polyline({
-		path: polylinePathPoints,
-		geodesic: true,
-		strokeColor: '#008800',
-		strokeOpacity: 0.8,
-		strokeWeight: 3,
-		editable: false,
-		geodesic: false,
-		draggable: false,
-	});
+	// 初始化消息监听 - 监听window的message事件
+	window.addEventListener('message', handleIncomingMessage);
 
-	polylinePath.setMap(map);
-	setMePositioningstart(39.973114, 116.403568)
-	setMePositioningend(39.971141, 116.314304)
-}
-// 起点
-function setMePositioningstart(lat1, lng1) {
-	startMarker = new google.maps.Marker({
-		position: {
-			lat: lat1,
-			lng: lng1
-		},
-		icon: {
-			url: img,
-			scaledSize: new google.maps.Size(50, 50),
-		},
-		animation: 'BOUNCE',
-		map: map
-	});
-}
-// 终点
-function setMePositioningend(lat1, lng1) {
-	endMarker = new google.maps.Marker({
-		position: {
-			lat: lat1,
-			lng: lng1
-		},
-		icon: {
-			url: img,
-			scaledSize: new google.maps.Size(50, 50),
-		},
-		animation: 'BOUNCE',
-		map: map
-	});
-}
-
-function ListeningMarkerClick(marker, clickIndex) {
-	var contentString = '<div id="myButton_' + clickIndex + '">' +
-		'<div class="infoWindow-title">' + marker.title + '</div>' +
-		'<p class="textoverflow">' +
-		1234455 + '</p >' +
-		'< img class="imgs" src=' + marker.imgUrl +
-		'/>' +
-		'</div>';
-	var infowindow = new google.maps.InfoWindow({
-		content: contentString,
-		maxWidth: 200,
-		disableAutoPan: true,
-		zIndex: 100,
-		pixelOffset: new google.maps.Size(-35, 0),
-
-	});
 	/**
-	 * 监听点击maker标记点弹出信息窗
-	 * 
-	 * */
-	google.maps.event.addListener(marker, 'click', function() {
-		// infowindow.open(map, marker); //多个信息窗口显示
-		if (openInfoWindow) { //单个信息窗口
-			openInfoWindow.close();
-		}
-		infowindow.open(map, marker);
-		openInfoWindow = infowindow;
-		setTimeoutInfoWindowClick(clickIndex);
-	});
-	// 关闭信息窗口
-	infowindow.addListener('closeclick', () => {
-		Toast('关闭了信息窗口', 500)
-	});
-}
+	 * 统一位置更新方法
+	 * @param {number} lat - 纬度
+	 * @param {number} lng - 经度
+	 * @param {boolean} isFromDesk - 是否来自desk数据源
+	 */
+	function updateUserPosition(lat, lng, isFromDesk = false) {
+		// 更新全局位置变量
+		userLat = lat;
+		userLng = lng;
 
-function markerClickAnimation(marker) {
-	marker.addListener('click', function() {
-		if (lastClickedMarker && lastClickedMarker.getAnimation() !== null) {
-			lastClickedMarker.setAnimation(null);
+		// 如果标记已存在 - 更新现有标记
+		if (userMarker) {
+			// 设置标记的新位置
+			userMarker.setPosition({
+				lat: userLat,
+				lng: userLng
+			});
+			// 根据数据源更新标记图标
+			userMarker.setIcon({
+				url: isFromDesk ? MARKER_CAR : MARKER_ICON,
+				scaledSize: new google.maps.Size(
+					isFromDesk ? MARKER_CAR_SIZE.width : MARKER_SIZE,
+					isFromDesk ? MARKER_CAR_SIZE.height : MARKER_SIZE
+				)
+			});
 		}
-		// 设置当前点击的 Marker 动画效果
-		marker.setAnimation(google.maps.Animation.BOUNCE);
-		// 记录当前点击的 Marker
-		lastClickedMarker = marker;
-	});
-}
+		// 如果标记不存在但地图已初始化 - 创建新标记
+		else if (mapInstance) {
+			createUserMarker(isFromDesk);
+		}
 
-function setTimeoutInfoWindowClick(clickIndex) {
-	setTimeout(() => {
-		var element = document.getElementById('myButton_' + clickIndex);
-		element.addEventListener("click", function() {
-			Toast('点击了第' + clickIndex + '个信息窗口元素')
+		// 如果地图实例存在 - 更新地图视图
+		if (mapInstance) {
+			// 将地图中心移动到新位置
+			mapInstance.setCenter({
+				lat: userLat,
+				lng: userLng
+			});
+			// 确保地图保持在默认缩放级别
+			mapInstance.setZoom(DEFAULT_ZOOM);
+		}
+	}
+
+	/**
+	 * 初始化地图核心功能
+	 * @param {GeolocationPosition} position - 浏览器返回的地理位置对象
+	 */
+	function initMapCore(position) {
+		// 判断是否使用desk数据源（优先使用）
+		const useDeskData = source === 'desk' && infoContent?.latitude;
+
+		// 更新用户位置：优先使用desk数据，否则使用浏览器定位数据
+		updateUserPosition(
+			useDeskData ? infoContent.latitude : position.coords.latitude,
+			useDeskData ? infoContent.longitude : position.coords.longitude,
+			useDeskData
+		);
+
+		// 如果地图实例尚未创建 - 初始化地图
+		if (!mapInstance) {
+			// 创建Google地图实例
+			mapInstance = new google.maps.Map(document.getElementById('map'), {
+				zoom: DEFAULT_ZOOM, // 设置初始缩放级别
+				center: {
+					lat: userLat,
+					lng: userLng
+				}, // 设置初始中心点
+				disableDefaultUI: true, // 禁用默认UI控件
+				gestureHandling: "greedy", // 单指操作地图（移动端优化）
+				mapTypeControl: false, // 隐藏地图类型控件
+				fullscreenControl: false // 隐藏全屏控件
+			});
+
+			// 确保用户标记被创建
+			if (!userMarker) {
+				createUserMarker(useDeskData);
+			}
+
+			// 设置按钮事件监听器
+			setupEventListeners();
+
+
+		}
+
+		// 标记地图已初始化
+		isMapInitialized = true;
+	}
+
+	/**
+	 * 创建用户位置标记（无动画）
+	 * @param {boolean} isFromDesk - 是否使用desk图标
+	 */
+	function createUserMarker(isFromDesk = false) {
+		// 确保地图实例存在
+		if (!mapInstance) return;
+
+		// 创建新的地图标记（无动画）
+		userMarker = new google.maps.Marker({
+			position: {
+				lat: userLat,
+				lng: userLng
+			}, // 标记位置
+			icon: {
+				url: isFromDesk ? MARKER_CAR : MARKER_ICON, // 根据来源选择图标
+				scaledSize: new google.maps.Size( // 设置图标尺寸
+					isFromDesk ? MARKER_CAR_SIZE.width : MARKER_SIZE,
+					isFromDesk ? MARKER_CAR_SIZE.height : MARKER_SIZE
+				)
+			},
+			map: mapInstance, // 关联到地图实例
+			optimized: false // 禁用优化以确保动态更新性能
 		});
-	}, 50)
-}
-// 点击归还车辆
-function ListenclickStartRun() {
-	document.getElementById('returning-vehicles').addEventListener('click', function() {
+	}
+
+	/**
+	 * 主初始化函数 - 由Google Maps API调用
+	 */
+	function initMap() {
+		// 检查浏览器是否支持地理位置API
+		if (!navigator.geolocation) {
+			showToast('您的浏览器不支持定位功能');
+			return;
+		}
+
+		// 获取用户当前位置
+		navigator.geolocation.getCurrentPosition(
+			position => initMapCore(position), // 成功回调
+			error => handleGeoError(error), // 错误回调
+			{ // 定位配置选项
+				enableHighAccuracy: true, // 高精度模式
+				timeout: 8000, // 8秒超时
+				maximumAge: 0 // 不使用缓存位置
+			}
+		);
+	}
+
+	/**
+	 * 处理地理位置错误
+	 * @param {GeolocationPositionError} error - 地理位置错误对象
+	 */
+	function handleGeoError(error) {
+		// 定义错误代码对应的用户友好消息
+		const errorMessages = {
+			1: '位置服务被拒绝，请在设置中开启权限', // PERMISSION_DENIED
+			2: '暂时获取不到位置信息，请确保网络畅通', // POSITION_UNAVAILABLE
+			3: '获取位置信息超时，请重试' // TIMEOUT
+		};
+
+		// 显示错误消息（优先使用预设消息，否则显示原生错误）
+		showToast(errorMessages[error.code] || '获取位置失败: ' + error.message);
+	}
+
+	/**
+	 * 设置事件监听器，处理按钮点击并发送消息到宿主环境
+	 * @param {string} source - 消息来源标识符
+	 */
+	function setupEventListeners(source) {
+		// 按钮配置：ID与对应的消息类型
+		const buttonConfigs = [{
+				id: 'btn1',
+				type: 1
+			}, // 锁门
+			{
+				id: 'btn3',
+				type: 3
+			}, // 开门
+			{
+				id: 'btn5',
+				type: 5
+			}, // 寻车
+			{
+				id: 'btnReturn',
+				type: 'btnReturn'
+			}, // 归还车辆
+			{
+				id: 'btnSee',
+				type: 'btnSee'
+			}, // 查看照片
+			{
+				id: 'btn8',
+				type: 8
+			}, // 风控拦截
+			{
+				id: 'btn6',
+				type: 6
+			} // 取消风控
+		];
+
+		// 为每个按钮配置添加事件监听
+		buttonConfigs.forEach(config => {
+			const button = document.getElementById(config.id);
+			button?.addEventListener('click', () => sendMessageToHost(source, config.type));
+		});
+	}
+
+	/**
+	 * 向宿主环境发送标准化消息
+	 * @param {string} source - 消息来源标识符
+	 * @param {number|string} actionType - 按钮操作类型
+	 */
+	function sendMessageToHost(source, actionType) {
 		uni.postMessage({
 			data: {
-				source: 2,
-				sss: '1'
-			},
+				source: source,
+				type: actionType,
+				timestamp: Date.now() // 确保消息唯一性
+			}
 		});
+	}
 
-	})
-}
-window.initMap = initMap;
+
+	/**
+	 * 显示提示信息（简化版）
+	 * @param {string} message - 要显示的消息
+	 */
+	function showToast(message) {
+		// 实际项目中应替换为更友好的UI提示
+		console.warn('Toast:', message); // 控制台警告
+		// alert(message); // 简单弹窗（生产环境应注释掉）
+	}
+	/**
+	 * 高级按钮可见性控制器（配置驱动 + 自动化状态管理）
+	 * @param {string} source - 当前场景标识
+	 */
+	function toggleVisibility() {
+		// 场景配置矩阵（场景 -> 按钮ID -> 显示状态）
+		const visibilityMatrix = {
+			desk: {
+				btn1: true,
+				btn3: true,
+				btn5: true,
+				btnSee: true,
+				btnReturn: true
+			},
+			fk: {
+				btn6: true,
+				btn8: true
+			}
+		};
+
+		// 自动化状态应用（单次DOM遍历）
+		Object.entries(visibilityMatrix).forEach(([scene, buttons]) => {
+			Object.keys(buttons).forEach(id => {
+				const element = document.getElementById(id);
+				if (element) {
+					// 当前场景显示，其他场景隐藏
+					element.style.display = source === scene ? 'block' : 'none';
+				}
+			});
+		});
+	}
+
+	// 将initMap函数暴露给全局作用域，供Google Maps API回调
+	window.initMap = initMap;
+})();
