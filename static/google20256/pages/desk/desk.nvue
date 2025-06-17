@@ -649,7 +649,6 @@
 		width: 750rpx;
 		display: flex;
 		flex-direction: column;
-
 	}
 
 	/* 轮播图 */

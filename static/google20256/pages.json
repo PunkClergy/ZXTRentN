@@ -3,28 +3,55 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": ""
+				"navigationBarTitleText": "启动页"
 			}
-		}, 	{
-			"path": "pages/carRental/vehicleList/index" //车辆清单MCCK设备绑定
-		},{
+		},
+		{
+			"path": "pages/desk/desk",
+			"style": {
+				"navigationBarTitleText": "首页"
+			}
+		},
+		{
+			"path": "pages/carRental/vehicleList/index",
+			"style": {
+				"navigationBarTitleText": "车辆清单MCCK设备绑定"
+			}
+		}, {
 			"path": "pages/GPSTrajectory/GPSTrajectory",
 			"style": {
-				"navigationBarTitleText": ""
+				"navigationBarTitleText": "GPS轨迹"
 			}
 		},
 		{
-			"path" : "pages/desk/desk",
-			"style" : 
-			{
-				"navigationBarTitleText" : ""
+			"path": "pages/system/account/transfer/index",
+			"style": {
+				"navigationBarTitleText": "移交管理员"
 			}
 		},
 		{
-			"path" : "components/common-header/common-header",
-			"style" : 
-			{
-				"navigationBarTitleText" : ""
+			"path": "pages/system/role/roleList/index",
+			"style": {
+				"navigationBarTitleText": "角色管理"
+			}
+		},
+		{
+			"path": "pages/system/role/reserve/index",
+			"style": {
+				"navigationBarTitleText": "预设角色-分离"
+			}
+		},
+		{
+			"path": "pages/carRental/sendElectronicKey/index",
+			"style": {
+				"navigationBarTitleText": "租车人发送电子钥匙"
+			}
+		},
+
+		{
+			"path": "pages/carRental/carServiceKey/carServiceKey",
+			"style": {
+				"navigationBarTitleText": "车务使用电子钥匙"
 			}
 		}
 	],
@@ -33,7 +60,7 @@
 		"navigationBarTitleText": "uni-app",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8",
-				"navigationStyle": "custom"
+		"navigationStyle": "custom"
 	},
 	"uniIdRouter": {}
 }

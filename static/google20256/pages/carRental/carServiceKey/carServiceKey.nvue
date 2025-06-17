@@ -1,0 +1,129 @@
+<template>
+	<view class="container" :style="containerStyle" @touchmove.prevent="handleTouchMove">
+		<CustomNavBar title="车务使用电子钥匙" />
+		<view class="select-region">
+			<view class="select-vehicle">
+				<text>选择车辆</text>
+				<image src="/static/public/left.png" class="select-vehicle-image"></image>
+			</view>
+		</view>
+		<view class="web-view-container">
+			<web-view ref="webview" @onPostMessage="handlePostMessage" :src="webUrlWithTimestamp"
+				:style="{ height: contentHeight + 'px' }">
+			</web-view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import {
+		info_screen
+	} from '@/utils/scheme/screen.js'
+	import CustomNavBar from "@/components/custom-header/index.nvue";
+	export default {
+		data() {
+			return {
+				screenInfo: {}, // 屏幕信息对象
+				nowTimestamp: Date.now(), // 缓存时间戳
+			}
+		},
+		components: {
+			CustomNavBar
+		},
+
+		methods: {
+			async initialScreenInfo() {
+				try {
+					this.screenInfo = await info_screen()
+
+
+					if (process.env.NODE_ENV === 'development') {
+						console.log('Screen info:', this.screenInfo)
+					}
+				} catch (error) {
+					console.error('[ScreenInfo] 获取屏幕信息失败:', error)
+					uni.showToast({
+						title: '设备信息获取失败',
+						icon: 'none'
+					})
+				}
+			},
+		},
+		computed: {
+			// 容器样式
+			containerStyle() {
+				return {
+					height: `${this.screenInfo.screenHeight || 667}px`
+				}
+			},
+			// 带时间戳的Web URL
+			webUrlWithTimestamp() {
+				return `/hybrid/html/homePgae.html?nowTime=${this.nowTimestamp}`
+			},
+			// 状态栏高度
+			statusBarHeight() {
+				return this.screenInfo.statusBarHeight || 0;
+			},
+			contentHeight() {
+				return this?.screenInfo?.screenHeight
+			}
+		},
+		async onShow() {
+			this.isLoading = true;
+			uni.hideTabBar({
+				animation: true
+			});
+
+			try {
+				await Promise.allSettled([
+					this.initialScreenInfo(),
+				]);
+
+				this.nowTimestamp = Date.now();
+			} catch (error) {
+				console.error('初始化失败:', error);
+			} finally {
+				this.isLoading = false;
+			}
+		},
+	}
+</script>
+
+<style>
+	/* ===== 基础布局 ===== */
+	.container {
+		width: 750rpx;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.select-region {
+		width: 740rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 10rpx;
+		border-radius: 6rpx 10rpx;
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	}
+	.select-vehicle-image {
+		width: 50rpx;
+		height: 50rpx;
+	}
+
+	.web-view-container {
+		width: 740rpx;
+	}
+
+	.select-vehicle {
+		width: 720rpx;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		border-radius: 8px;
+		height: 50px;
+		background-color: aliceblue;
+	}
+</style>
