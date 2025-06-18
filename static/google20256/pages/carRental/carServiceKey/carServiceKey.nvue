@@ -19,6 +19,10 @@
 	import {
 		info_screen
 	} from '@/utils/scheme/screen.js'
+	import {
+		u_getAllCarPoisiton
+	} from '@/api'
+	import 'url-search-params-polyfill';
 	import CustomNavBar from "@/components/custom-header/index.nvue";
 	export default {
 		data() {
@@ -30,8 +34,43 @@
 		components: {
 			CustomNavBar
 		},
+		mounted() {
+			this.initSearchLink()
 
+		},
 		methods: {
+			// 项HTML发送数据前先请求拿到数据
+			async initSearchLink() {
+				console.log(11233)
+				try {
+					const res = await u_getAllCarPoisiton()
+					const info = res.content
+					setTimeout(() => {
+						this.sendDataToWebview({
+							type: 'elctrncky',
+							payload: info
+						});
+					}, 2000);
+				} catch (error) {
+					console.error('请求失败:', error)
+				}
+			},
+			// 向 HTML 发送数据
+			sendDataToWebview(data) {
+				const payload = JSON.stringify(data);
+				const jsStr = `window.postMessage(${payload}, '*')`;
+				// APP 端使用 evalJS
+				// #ifdef APP-PLUS
+				const webview = this.$refs.webview;
+				webview.evalJS(jsStr);
+				// #endif
+
+				// H5 端直接调用 iframe 方法
+				// #ifdef H5
+				const iframe = document.querySelector('web-view iframe');
+				iframe?.contentWindow?.postMessage(data, '*');
+				// #endif
+			},
 			async initialScreenInfo() {
 				try {
 					this.screenInfo = await info_screen()
@@ -58,14 +97,33 @@
 			},
 			// 带时间戳的Web URL
 			webUrlWithTimestamp() {
-				return `/hybrid/html/homePgae.html?nowTime=${this.nowTimestamp}`
+				return `/hybrid/html/sendKey.html?nowTime=${this.nowTimestamp}`
 			},
 			// 状态栏高度
 			statusBarHeight() {
 				return this.screenInfo.statusBarHeight || 0;
 			},
-			contentHeight() {
-				return this?.screenInfo?.screenHeight
+			// 导航栏主体高度
+			navBarHeight() {
+				return this.screenInfo.platform === 'ios' ? 49 : 44;
+			},
+			contentHeight(config = {}) {
+				const {
+					screenHeight,
+					statusBarHeight,
+					platform
+				} = this.screenInfo;
+				const {
+					navBarHeight = {
+						ios: 49,
+						android: 44
+					}
+				} = config;
+
+				const navHeight = navBarHeight[platform] || navBarHeight.default || 44;
+				const rong = 10
+
+				return screenHeight - (statusBarHeight + navHeight + 50 + rong);
 			}
 		},
 		async onShow() {
@@ -107,6 +165,7 @@
 		border-radius: 6rpx 10rpx;
 		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 	}
+
 	.select-vehicle-image {
 		width: 50rpx;
 		height: 50rpx;
