@@ -216,7 +216,6 @@ function setupMarkerEvents(marker, index) {
         // 打开信息窗口
         infowindow.open(map, marker);
         openInfoWindow = infowindow;
-        
         // 将地图中心点移动到标记位置
         map.panTo(marker.getPosition());
         console.log("地图中心已移动到标记位置");
