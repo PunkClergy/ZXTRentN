@@ -10,7 +10,7 @@
 			<view v-else>
 				<view
 					style="display: flex;flex-direction: row;justify-content: space-between;width: 730rpx;border-bottom: 1px solid #f0f0f0;padding: 20rpx;">
-					<view>1232</view>
+					<view>{{vehicle_info?.sn}}</view>
 					<view>43243432</view>
 				</view>
 				<view
