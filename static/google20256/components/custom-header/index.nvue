@@ -83,13 +83,13 @@
 
 <style>
 	.status-bar {
-		background-color: #F8F8F8;
+		/* background-color: #F8F8F8; */
 	}
 
 	/* 导航栏样式 */
 	.nav-bar {
 		display: flex;
-		background-color: #F8F8F8;
+		/* background-color: #F8F8F8; */
 		justify-content: center;
 		/* box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1); */
 	}

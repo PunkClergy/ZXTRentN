@@ -1,4 +1,4 @@
-var currentLat = ''; // 当前位置纬度（重命名更清晰）
+var currentLat = ''; // 当前位置纬度
 var currentLng = ''; // 当前位置经度
 var zoom = 18; // 地图缩放比例
 var meMarker = ''; // 个人位置标记点
@@ -9,12 +9,20 @@ let openInfoWindow; // 当前打开的信息窗口
 var info = [];
 var map; // 全局map实例
 var isMapInitialized = false; // 标记地图是否初始化
+var isFirstLoad = true; // 标记是否是首次加载
+var vehicle_info = {}
 
 // 消息监听器
 window.addEventListener('message', (e) => {
 	if (e.data.type === 'elctrncky') {
 		console.log('收到初始化数据:', e.data.payload);
 		info = e.data.payload;
+
+		// 确保正确接收 vehicle_info
+		vehicle_info = e.data?.vehicle_info || {};
+		console.log('收到车辆信息:', vehicle_info);
+		console.log('车辆SN:', vehicle_info.sn);
+		console.log('车辆信息类型:', typeof vehicle_info);
 
 		// 如果地图已初始化，直接创建标记
 		if (isMapInitialized) {
@@ -82,6 +90,8 @@ function setMePositioning() {
  * 创建标记点
  */
 function createMarkers() {
+	console.log('创建标记点，车辆信息:', vehicle_info);
+
 	// 清除现有标记
 	clearMarkers();
 
@@ -102,12 +112,66 @@ function createMarkers() {
 				scaledSize: new google.maps.Size(17, 36),
 			},
 			address: item.address,
+			sn: item.sn,
 			map: map
 		});
 
 		markers.push(marker);
 		setupMarkerEvents(marker, index);
 	});
+
+	// 首次加载时尝试打开匹配的标记信息窗口
+	if (isFirstLoad && markers.length > 0) {
+		console.log('首次加载，尝试打开匹配标记');
+		openMatchingMarkerInfoWindow();
+		isFirstLoad = false;
+	}
+}
+
+/**
+ * 打开匹配车辆的信息窗口
+ */
+function openMatchingMarkerInfoWindow() {
+	// 添加详细的日志输出
+	console.log('打开匹配车辆信息窗口函数开始');
+	console.log('vehicle_info:', vehicle_info);
+	console.log('vehicle_info.sn:', vehicle_info?.sn);
+	console.log('vehicle_info.sn 类型:', typeof vehicle_info?.sn);
+
+	// 如果没有车辆信息或SN号，则不打开任何弹窗
+	if (!vehicle_info || !vehicle_info.sn) {
+		console.log("没有车辆信息或SN为空，不打开任何弹窗");
+		return;
+	}
+
+	console.log("尝试匹配车辆SN:", vehicle_info.sn);
+	console.log("当前所有标记的SN:", markers.map(m => m.sn));
+
+	// 查找匹配的标记
+	let matchingMarker = null;
+
+	// 首先尝试精确匹配
+	matchingMarker = markers.find(marker => marker.sn === vehicle_info.sn);
+
+	// 如果没有找到，尝试字符串匹配
+	if (!matchingMarker) {
+		console.log("尝试字符串匹配");
+		matchingMarker = markers.find(marker =>
+			marker.sn.toString() === vehicle_info.sn.toString()
+		);
+	}
+
+	if (matchingMarker) {
+		console.log("找到匹配标记:", matchingMarker);
+		// 直接模拟点击匹配的标记
+		setTimeout(() => {
+			console.log("触发标记点击事件");
+			google.maps.event.trigger(matchingMarker, 'click');
+		}, 500);
+	} else {
+		console.log(`未找到匹配车辆: ${vehicle_info.sn}, 不打开信息窗口`);
+		console.log("所有可用SN:", markers.map(m => m.sn));
+	}
 }
 
 /**
@@ -128,19 +192,41 @@ function setupMarkerEvents(marker, index) {
 
 	// 添加点击事件监听
 	marker.addListener('click', () => {
+		console.log(`点击标记: ${marker.title} (SN: ${marker.sn})`);
 
+		// 停止上一个标记的动画
+		if (lastClickedMarker && lastClickedMarker.getAnimation() !== null) {
+			lastClickedMarker.setAnimation(null);
+		}
 
-
+		// 设置当前标记动画
+		marker.setAnimation(google.maps.Animation.BOUNCE);
 		lastClickedMarker = marker;
 
 		// 关闭之前的信息窗口并打开新的
 		if (openInfoWindow) {
 			openInfoWindow.close();
 		}
+
+		// 打开信息窗口
 		infowindow.open(map, marker);
 		openInfoWindow = infowindow;
-		alert(123)
 
+		// 触发选择事件
+		handleMarkerSelection(marker, index);
+	});
+}
+
+/**
+ * 处理标记选择
+ */
+function handleMarkerSelection(marker, index) {
+	console.log(`已选择车辆: ${marker.title} (SN: ${marker.sn})`);
+	uni.postMessage({
+		data: {
+			type: 'sn',
+			sn: marker?.sn
+		}
 	});
 }
 

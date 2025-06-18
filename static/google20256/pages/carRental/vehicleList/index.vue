@@ -60,7 +60,8 @@
 							</view>
 							<view class="content-item-footer">
 								<view class="footer-right">
-									<view class="footer-right-btn" :data-item="item">
+									<view class="footer-right-btn" :data-item="item" v-if="souce"
+										@tap="handleSelectVehicle">
 										<text>选择此车</text>
 									</view>
 									<view>
@@ -169,7 +170,7 @@
 	import {
 		info_screen
 	} from '@/utils/scheme/screen.js'
-		import 'url-search-params-polyfill';
+	import 'url-search-params-polyfill';
 
 	export default {
 		components: {
@@ -183,11 +184,13 @@
 				g_activeTab: 1, // 当前激活的标签页(1:车辆列表 2:新增车辆)
 				btnState: '新增', // 按钮显示文本
 				params: {},
-				batterylift: '一键启动'
+				batterylift: '一键启动',
+				souce: null
 			};
 		},
 		onLoad(options) {
 			// 页面加载时逻辑
+			this.souce = options?.souce
 		},
 		onShow() {
 			// 页面显示时初始化
@@ -213,6 +216,13 @@
 			}
 		},
 		methods: {
+			handleSelectVehicle(evt) {
+				console.log(evt?.currentTarget?.dataset)
+				uni.redirectTo({
+					url: `${this.souce}?info=${JSON.stringify(evt.currentTarget.dataset.item)}`
+				});
+
+			},
 			// 滚动到底部加载更多
 			lower(e) {
 				if (!this.loading) {

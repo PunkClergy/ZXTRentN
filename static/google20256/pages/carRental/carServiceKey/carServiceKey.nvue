@@ -1,12 +1,28 @@
 <template>
-	<view class="container" :style="containerStyle" @touchmove.prevent="handleTouchMove">
+	<view class="container" :style="containerStyle" @touchmove.prevent="handleTouchMove"
+		style="background-color: aqua;">
 		<CustomNavBar title="车务使用电子钥匙" />
 		<view class="select-region">
-			<view class="select-vehicle">
+			<view class="select-vehicle" @tap="handleJumpVehicle" v-if="!vehicle_info?.sn">
 				<text>选择车辆</text>
 				<image src="/static/public/left.png" class="select-vehicle-image"></image>
 			</view>
+			<view v-else>
+				<view
+					style="display: flex;flex-direction: row;justify-content: space-between;width: 730rpx;border-bottom: 1px solid #f0f0f0;padding: 20rpx;">
+					<view>1232</view>
+					<view>43243432</view>
+				</view>
+				<view
+					style="display: flex;width: 730rpx;flex-direction: row;justify-content: space-between;padding: 20rpx;">
+					<view>
+						车架号：222
+					</view>
+					<view>油箱容积：222</view>
+				</view>
+			</view>
 		</view>
+
 		<view class="web-view-container">
 			<web-view ref="webview" @onPostMessage="handlePostMessage" :src="webUrlWithTimestamp"
 				:style="{ height: contentHeight + 'px' }">
@@ -29,26 +45,39 @@
 			return {
 				screenInfo: {}, // 屏幕信息对象
 				nowTimestamp: Date.now(), // 缓存时间戳
+				vehicle_info: {}, //车辆信息
 			}
 		},
 		components: {
 			CustomNavBar
+		},
+		onLoad(options) {
+			console.log(22222222222222, options)
+			this.initVehicleInfo(options?.info)
 		},
 		mounted() {
 			this.initSearchLink()
 
 		},
 		methods: {
+			// 请求车辆信息
+			initVehicleInfo(evt) {
+				this.vehicle_info = JSON.parse(evt)
+				// 初始化位置信息
+				this.$nextTick(() => {
+					this.initSearchLink()
+				});
+			},
 			// 项HTML发送数据前先请求拿到数据
 			async initSearchLink() {
-				console.log(11233)
 				try {
 					const res = await u_getAllCarPoisiton()
 					const info = res.content
 					setTimeout(() => {
 						this.sendDataToWebview({
 							type: 'elctrncky',
-							payload: info
+							payload: info,
+							vehicle_info: this.vehicle_info
 						});
 					}, 2000);
 				} catch (error) {
@@ -87,6 +116,14 @@
 					})
 				}
 			},
+			handleJumpVehicle() {
+				uni.redirectTo({
+					url: `/pages/carRental/vehicleList/index?souce=/pages/carRental/carServiceKey/carServiceKey`
+				});
+			},
+			handlePostMessage(evt) {
+				console.log(evt)
+			}
 		},
 		computed: {
 			// 容器样式
@@ -143,6 +180,7 @@
 			} finally {
 				this.isLoading = false;
 			}
+			this.initSearchLink()
 		},
 	}
 </script>
@@ -164,6 +202,8 @@
 		padding: 10rpx;
 		border-radius: 6rpx 10rpx;
 		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+		background-color: #fff;
+		margin-bottom: 5rpx;
 	}
 
 	.select-vehicle-image {
