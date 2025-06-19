@@ -271,9 +271,10 @@
 				this.g_uesr_details = {}
 			},
 			async handleCance(evt) {
+				console.log(evt?.currentTarget?.dataset?.item?.controlcode)
 				try {
 					const res = await u_cancelRentKey({
-						controlcode: evt?.currentTarget?.dataset?.item?.controlcode,
+						controlCode: evt?.currentTarget?.dataset?.item?.controlcode,
 					});
 					if (res.code == 1000) {
 						this.$nextTick(() => {
@@ -368,18 +369,18 @@
 					}
 				});
 			},
+
+
 			async handleFormSubmit(evt) {
 				if (this.whether) {
 					try {
-						console.log({
-							controlcode: this.g_uesr_details?.controlcode,
-							startDate: this.startDate + '' + this.startTime,
-							endDate: this.endDate + '' + this.endTime,
-						})
+
 						const res = await u_updateRentKey({
-							controlcode: this.g_uesr_details?.controlcode,
-							startDate: this.startDate + ' ' + this.startTime,
-							endDate: this.endDate + ' ' + this.endTime,
+							controlCode: this.g_uesr_details?.controlcode,
+							startDate: `${this.startDate || ''} ${this.startTime ? `${this.startTime}:00` : '00:00:00'}`
+								.trim(),
+							endDate: `${this.endDate || ''} ${this.endTime ? `${this.endTime}:00` : '00:00:00'}`
+								.trim()
 						});
 						console.log(res)
 						if (res.code == 1000) {
@@ -404,8 +405,10 @@
 					try {
 						const res = await u_sendRentKey({
 							vehId: this.g_uesr_details?.id,
-							startDate: `${this.startDate} ${this.startTime}`, 
-							 endDate: `${this.endDate} ${this.endTime}`,
+							startDate: `${this.startDate || ''} ${this.startTime ? `${this.startTime}:00` : '00:00:00'}`
+								.trim(),
+							endDate: `${this.endDate || ''} ${this.endTime ? `${this.endTime}:00` : '00:00:00'}`
+								.trim(),
 							personName: evt?.detail?.value?.personName,
 							mobile: evt?.detail?.value?.mobile
 						});
