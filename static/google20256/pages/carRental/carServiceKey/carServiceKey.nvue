@@ -1,6 +1,5 @@
 <template>
-	<view class="container" :style="containerStyle" @touchmove.prevent="handleTouchMove"
-		style="background-color: aqua;">
+	<view class="container" :style="containerStyle" @touchmove.prevent="handleTouchMove">
 		<CustomNavBar title="车务使用电子钥匙" />
 		<view class="select-region">
 			<view class="select-vehicle" @tap="handleJumpVehicle" v-if="!vehicle_info?.sn">

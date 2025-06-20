@@ -55,11 +55,16 @@
 			}
 		},
 		{
-			"path" : "pages/oil/automatic/index",
-			"style" : 
-			{
-				"navigationBarTitleText" : "自动检测油量"
+			"path": "pages/oil/automatic/index",
+			"style": {
+				"navigationBarTitleText": "自动检测油量"
 			}
+		},
+		{
+			"path": "pages/login/login" //登录
+		},
+		{
+			"path": "pages/register/register" //注册
 		}
 	],
 	"globalStyle": {
