@@ -110,7 +110,19 @@
 						<image src="/static/public/close.png" @tap="handleHideSengKeyModal" />
 					</view>
 					<view class="modal-container-middle">
-						
+						<circle-progress-bar :pro="proportion" :border_back_color="'#297DFE'" :border_color="'#FB8F23'">
+							<view style="font-size: 28rpx;color: #333width: 100%;text-align: center;margin: 20rpx 0;">
+								本次检测油量
+							</view>
+							<view
+								style=" font-weight: bold;color: #333;font-size: 42rpx;width: 100%;text-align: center;margin: 20rpx 0;">
+								{{remaining_oil_quantity}}L
+							</view>
+							<view
+								style=" font-weight: bold;color: #333;font-size: 28rpx;width: 100%;text-align: center;margin-top: 20rpx;">
+								20%
+							</view>
+						</circle-progress-bar>
 					</view>
 					<view class="modal-container-footer">
 						<button formType="submit">确认</button>
@@ -129,21 +141,25 @@
 		u_dzBussinessMobileApiGetCarStatus
 	} from '@/api'
 	import CustomNavBar from "@/components/custom-header/index.vue";
+	import CircleProgressBar from '@/components/circle-progress-bar/circle-progress-bar.vue'
 	import {
 		info_screen
 	} from '@/utils/scheme/screen.js'
 
 	export default {
 		components: {
-			CustomNavBar
+			CustomNavBar,
+			CircleProgressBar
 		},
 		data() {
 			return {
 				screenInfo: {}, // 屏幕信息对象
 				g_items: [], // 车辆列表数据
 				vehicle_info: {},
-				c_send_key_show_momal: true,
-				g_uesr_details: {}
+				c_send_key_show_momal: false,
+				g_uesr_details: {},
+				remaining_oil_quantity: 0,
+				proportion: 0
 			};
 		},
 		onLoad(options) {
@@ -201,9 +217,7 @@
 					const temp = {
 						vehId: this.vehicle_info?.id
 					}
-					console.log(temp)
 					const res = await u_oilDipstickapiDipsticHistory(temp);
-					console.log(88888888888, res?.content)
 					this.g_items = res?.content
 				} catch (error) {
 					console.error('[ScreenInfo] 获取记录失败:', error);
@@ -211,18 +225,45 @@
 				}
 			},
 			async handleGetOilButtonTap() {
+				this.c_send_key_show_momal = true;
 				try {
 					const res = await u_dzBussinessMobileApiGetCarStatus({
-						sn: this.vehicle_info?.sn
+						sn: '640019899'
 					});
-					console.log(12332323, res)
+
+					const info = res?.content || {};
+					let calculatedOil = 0;
+
+					// 统一处理逻辑，避免重复代码
+					if (info?.typeOfReMailOil === 1) {
+						const oilPercentage = Math.max(0, Number(info?.confirmOilRemainA || 0));
+						calculatedOil = Number(this.vehicle_info?.xsgw || 0) * (oilPercentage / 100);
+					} else {
+						calculatedOil = Math.max(0, Number(info?.confirmOilRemainA || 0));
+					}
+
+					// 更新油量数据（保留1位小数）
+					this.remaining_oil_quantity = Number(calculatedOil.toFixed(1));
+
+					// 计算并更新百分比值 (pr)
+					const total = this.vehicle_info?.xsgw || 0;
+					const oilProgress = total > 0 ? this.remaining_oil_quantity / total : 0;
+					this.proportion = Math.max(0, oilProgress); // 确保在0-100范围内
+					console.log(5656567675, total, Math.max(0, Math.round(oilProgress * 100)))
+
 				} catch (error) {
-					console.error('[ScreenInfo] 检测失败', error);
+					console.error('[Oil Detection] 油量检测失败', error);
 					uni.showToast({
-						title: '设备信息获取失败',
-						icon: 'none'
+						title: '油量检测失败，请重试',
+						icon: 'none',
+						duration: 3000
 					});
+					// 出错时重置pr值
+					this.proportion = 0;
 				}
+			},
+			handleHideSengKeyModal() {
+				this.c_send_key_show_momal = false
 			}
 
 
