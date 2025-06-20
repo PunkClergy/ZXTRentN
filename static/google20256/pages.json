@@ -53,6 +53,13 @@
 			"style": {
 				"navigationBarTitleText": "车务使用电子钥匙"
 			}
+		},
+		{
+			"path" : "pages/oil/automatic/index",
+			"style" : 
+			{
+				"navigationBarTitleText" : "自动检测油量"
+			}
 		}
 	],
 	"globalStyle": {
