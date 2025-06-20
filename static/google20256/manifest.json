@@ -1,27 +1,32 @@
 {
-    "name" : "google20256",
-    "appid" : "",
+    "name" : "智信通",
+    "appid" : "__UNI__0192300",
     "description" : "",
-    "versionName" : "1.0.0",
+    "versionName" : "1.0.2",
+    "package" : "com2.example.myapp",
     "versionCode" : "100",
     "transformPx" : false,
-    /* 5+App特有相关 */
     "app-plus" : {
+        /* 5+App特有相关 */
         "usingComponents" : true,
+        "nvueCompiler" : "uni-app",
         "nvueStyleCompiler" : "uni-app",
-        "compilerVersion" : 3,
         "splashscreen" : {
             "alwaysShowBeforeRender" : true,
             "waiting" : true,
             "autoclose" : true,
             "delay" : 0
         },
+        "modules" : {
+            "Maps" : {}
+        },
         /* 模块配置 */
-        "modules" : {},
-        /* 应用发布信息 */
         "distribute" : {
-            /* android打包配置 */
+            /* 应用发布信息 */
             "android" : {
+                "networkSecurityConfig" : true,
+                "package" : "com.example.myapp",
+                /* android打包配置 */
                 "permissions" : [
                     "<uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\"/>",
                     "<uses-permission android:name=\"android.permission.MOUNT_UNMOUNT_FILESYSTEMS\"/>",
@@ -37,36 +42,42 @@
                     "<uses-permission android:name=\"android.permission.WAKE_LOCK\"/>",
                     "<uses-permission android:name=\"android.permission.FLASHLIGHT\"/>",
                     "<uses-feature android:name=\"android.hardware.camera\"/>",
-                    "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>"
+                    "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>",
+                    "<uses-permission android:name=\"android.permission.INTERNET\"/>"
                 ]
             },
+            "ios" : {
+                "dSYMs" : false
+            },
             /* ios打包配置 */
-            "ios" : {},
-            /* SDK配置 */
-            "sdkConfigs" : {}
+            "sdkConfigs" : {
+                "maps" : {
+                    "google" : {
+                        "APIKey_ios" : "AIzaSyDhbwKKjOrtygKkBwDhLwPQ_OAg2oArLv4",
+                        "APIKey_android" : "AIzaSyDhbwKKjOrtygKkBwDhLwPQ_OAg2oArLv4"
+                    }
+                }
+            }
         }
     },
-    /* 快应用特有相关 */
+    /* SDK配置 */
     "quickapp" : {},
-    /* 小程序特有相关 */
+    /* 快应用特有相关 */
     "mp-weixin" : {
-        "appid" : "",
+        /* 小程序特有相关 */
+        "appid" : "wxba6c63453f7bdd31",
         "setting" : {
             "urlCheck" : false
         },
         "usingComponents" : true
     },
-    "mp-alipay" : {
-        "usingComponents" : true
-    },
-    "mp-baidu" : {
-        "usingComponents" : true
-    },
-    "mp-toutiao" : {
-        "usingComponents" : true
-    },
-    "uniStatistics" : {
-        "enable" : false
-    },
-    "vueVersion" : "3"
+    "vueVersion" : "3",
+    "h5" : {
+        "router" : {
+            "base" : "",
+            "mode" : "hash"
+        }
+    }
 }
+/* android打包配置 *//* ios打包配置 */
+

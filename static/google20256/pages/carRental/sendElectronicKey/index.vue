@@ -213,8 +213,7 @@
 	import {
 		info_screen
 	} from '@/utils/scheme/screen.js'
-	import 'url-search-params-polyfill';
-
+	import 'url-search-params-polyfill'; // 兼容URLSearchParams的polyfill
 
 	export default {
 		components: {
@@ -225,34 +224,35 @@
 				screenInfo: {}, // 屏幕信息对象
 				g_page: 1, // 当前页码
 				g_items: [], // 车辆列表数据
-				r_items: [], //使用记录列表
-				g_activeTab: 1, // 当前激活的标签页(1:车辆列表 2:新增车辆)
+				r_items: [], // 使用记录列表数据
+				g_activeTab: 1, // 当前激活的标签页 (1:车辆列表 2:新增车辆)
 				btnState: '新增', // 按钮显示文本
-				c_send_key_show_momal: false, //发送钥匙弹窗
-				g_uesr_details: {}, //弹窗From参数
-				startDate: '2025-03-20', //钥匙使用开始日期
-				startTime: '19:00', //钥匙使用开始时间
-				endDate: '2025-03-20', //钥匙开始使用日期
-				endTime: '19:00', //钥匙结束使用时间
-				whether: false
+				c_send_key_show_momal: false, // 发送钥匙弹窗显示状态
+				g_uesr_details: {}, // 弹窗表单参数
+				startDate: '', // 钥匙使用开始日期
+				startTime: '', // 钥匙使用开始时间
+				endDate: '', // 钥匙使用结束日期
+				endTime: '', // 钥匙使用结束时间
+				whether: false, // 标识当前操作是修改(true)还是新增(false)
+				loading: false // 加载状态标识（用于防止重复加载）
 			};
 		},
 		onLoad(options) {
-
+			// 页面加载生命周期，暂无操作
 		},
 		onShow() {
-			// 页面显示时初始化
-			this.initialCarList()
-			this.initialScreenInfo()
-			this.initRentRecord()
-			this.handleCurrentDate()
+			// 页面显示时初始化数据
+			this.initialCarList(); // 初始化车辆列表
+			this.initialScreenInfo(); // 获取屏幕信息
+			this.initRentRecord(); // 初始化租赁记录
+			this.handleCurrentDate(); // 设置当前日期时间
 		},
 		computed: {
 			// 状态栏高度
 			statusBarHeight() {
 				return this.screenInfo.statusBarHeight || 0;
 			},
-			// 导航栏高度
+			// 导航栏高度（根据平台区分）
 			navBarHeight() {
 				return this.screenInfo.platform === 'ios' ? 49 : 44;
 			},
@@ -266,205 +266,197 @@
 			}
 		},
 		methods: {
+			// 关闭发送钥匙弹窗
 			handleHideSengKeyModal() {
-				this.c_send_key_show_momal = false
-				this.g_uesr_details = {}
+				this.c_send_key_show_momal = false;
+				this.g_uesr_details = {};
 			},
+
+			// 取消钥匙授权
 			async handleCance(evt) {
-				console.log(evt?.currentTarget?.dataset?.item?.controlcode)
+				const controlCode = evt?.currentTarget?.dataset?.item?.controlcode;
+				if (!controlCode) return;
+
 				try {
 					const res = await u_cancelRentKey({
-						controlCode: evt?.currentTarget?.dataset?.item?.controlcode,
+						controlCode
 					});
-					if (res.code == 1000) {
+					if (res.code === 1000) {
+						this.g_page = 1
+						this.g_items = []
+						// 操作成功后刷新数据
 						this.$nextTick(() => {
-							this.initialCarList()
-							this.initRentRecord()
+							this.initialCarList();
+							this.initRentRecord();
 						});
 					} else {
 						uni.showToast({
-							title: res?.msg,
+							title: res?.msg || '操作失败',
 							icon: 'none',
 							duration: 2000
 						});
 					}
 				} catch (error) {
 					console.error('取消失败:', error);
-
+					uni.showToast({
+						title: '取消失败，请重试',
+						icon: 'none'
+					});
 				}
 			},
+
+			// 修改钥匙授权信息
 			handleModify(evt) {
-				this.whether = true;
+				const itemData = evt?.currentTarget?.dataset?.item || {};
+				this.whether = true; // 标记为修改操作
 				this.c_send_key_show_momal = true;
 
-				// 提取公共数据源避免重复访问
-				const itemData = evt?.currentTarget?.dataset?.item || {};
-
-				// 使用对象合并更新用户详情
+				// 更新表单数据
 				this.g_uesr_details = {
-					...this.g_uesr_details,
 					...itemData,
 					platenumber: itemData.platenumber,
-					personName: itemData.personname, // 注意大小写匹配
+					personName: itemData.personname,
 					mobile: itemData.mobile
 				};
 
-				// 封装日期时间拆分逻辑
+				// 拆分日期时间字符串
 				const splitDateTime = (datetime, fallback = ["", ""]) => {
 					if (!datetime) return fallback;
-					const parts = datetime.split(" ");
-					return [parts[0] || fallback[0], parts[1] || fallback[1]];
+					const [date = "", time = ""] = datetime.split(" ");
+					return [date, time.split(":").slice(0, 2).join(":")]; // 只取小时和分钟
 				};
 
-				// 统一处理日期时间字段
+				// 设置开始/结束日期时间
 				[this.startDate, this.startTime] = splitDateTime(itemData.startdate);
 				[this.endDate, this.endTime] = splitDateTime(itemData.enddate);
 			},
-			// 获取当前年月日 时分
+
+			// 设置当前日期时间为默认值
 			handleCurrentDate() {
-				// 日期格式化函数
-				const formatDate = date => {
-					const year = date.getFullYear();
-					const month = date.getMonth() + 1;
-					const day = date.getDate();
-					return `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day}`;
-				};
-
-				// 时间格式化函数
-				const formatTime = date => {
-					const hours = date.getHours();
-					const minutes = date.getMinutes();
-					return `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}`;
-				};
-
 				const now = new Date();
 				const tomorrow = new Date(now);
-				tomorrow.setDate(now.getDate() + 1); // 获取明天
+				tomorrow.setDate(now.getDate() + 1); // 明天日期
 
-				const currentDate = formatDate(now);
-				const tomorrowDate = formatDate(tomorrow);
-				const currentTime = formatTime(now);
+				// 日期格式化 (YYYY-MM-DD)
+				const formatDate = date =>
+					`${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
 
-				this.startDate = currentDate;
-				this.endDate = tomorrowDate;
-				this.startTime = currentTime;
-				this.endTime = currentTime;
+				// 时间格式化 (HH:mm)
+				const formatTime = date =>
+					`${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+
+				this.startDate = formatDate(now);
+				this.startTime = formatTime(now);
+				this.endDate = formatDate(tomorrow);
+				this.endTime = formatTime(now);
 			},
+
+			// 复制简单码到剪贴板
 			handleCopy(evt) {
-				const text = evt?.currentTarget.dataset?.item?.simplecode
+				const text = evt?.currentTarget.dataset?.item?.simplecode || '';
+				if (!text) return;
+
 				uni.setClipboardData({
 					data: text,
-					success: () => {
-						uni.showToast({
-							title: '复制成功',
-							icon: 'none'
-						});
-					},
-					fail: (err) => {
-						console.error('复制失败', err);
-						uni.showToast({
-							title: '复制失败，请重试',
-							icon: 'none'
-						});
-					}
+					success: () => uni.showToast({
+						title: '复制成功',
+						icon: 'none'
+					}),
+					fail: () => uni.showToast({
+						title: '复制失败',
+						icon: 'none'
+					})
 				});
 			},
 
-
+			// 表单提交处理（发送/更新钥匙）
 			async handleFormSubmit(evt) {
-				if (this.whether) {
-					try {
+				// 构建日期时间字符串
+				const buildDateTime = (date, time) =>
+					`${date} ${time ? `${time}:00` : '00:00:00'}`.trim();
 
-						const res = await u_updateRentKey({
+				const startDateTime = buildDateTime(this.startDate, this.startTime);
+				const endDateTime = buildDateTime(this.endDate, this.endTime);
+
+				try {
+					let res;
+					if (this.whether) {
+						// 更新钥匙授权
+						res = await u_updateRentKey({
 							controlCode: this.g_uesr_details?.controlcode,
-							startDate: `${this.startDate || ''} ${this.startTime ? `${this.startTime}:00` : '00:00:00'}`
-								.trim(),
-							endDate: `${this.endDate || ''} ${this.endTime ? `${this.endTime}:00` : '00:00:00'}`
-								.trim()
+							startDate: startDateTime,
+							endDate: endDateTime
 						});
-						console.log(res)
-						if (res.code == 1000) {
-							this.g_uesr_details = {}
-							this.c_send_key_show_momal = false
-							this.$nextTick(() => {
-								this.initialCarList()
-								this.initRentRecord()
-							});
-						} else {
-							uni.showToast({
-								title: res?.msg,
-								icon: 'none',
-								duration: 2000
-							});
-						}
-					} catch (error) {
-						console.error('获取车辆列表失败:', error);
-
-					}
-				} else {
-					try {
-						const res = await u_sendRentKey({
+					} else {
+						// 发送新钥匙授权
+						const formData = evt?.detail?.value || {};
+						res = await u_sendRentKey({
 							vehId: this.g_uesr_details?.id,
-							startDate: `${this.startDate || ''} ${this.startTime ? `${this.startTime}:00` : '00:00:00'}`
-								.trim(),
-							endDate: `${this.endDate || ''} ${this.endTime ? `${this.endTime}:00` : '00:00:00'}`
-								.trim(),
-							personName: evt?.detail?.value?.personName,
-							mobile: evt?.detail?.value?.mobile
+							startDate: startDateTime,
+							endDate: endDateTime,
+							personName: formData.personName,
+							mobile: formData.mobile
 						});
-						if (res.code == 1000) {
-							this.g_uesr_details = {}
-							this.c_send_key_show_momal = false
-							this.$nextTick(() => {
-								this.initialCarList()
-								this.initRentRecord()
-							});
-						} else {
-							uni.showToast({
-								title: res?.msg,
-								icon: 'none',
-								duration: 2000
-							});
-						}
-					} catch (error) {
-						console.error('获取车辆列表失败:', error);
-
 					}
-				}
 
+					if (res.code === 1000) {
+						this.handleHideSengKeyModal(); // 关闭弹窗
+						this.g_page = 1
+						this.g_items = []
+						// 刷新数据
+						this.$nextTick(() => {
+							this.initialCarList();
+							this.initRentRecord();
+						});
+					} else {
+						uni.showToast({
+							title: res?.msg || '操作失败',
+							icon: 'none',
+							duration: 2000
+						});
+					}
+				} catch (error) {
+					console.error('操作失败:', error);
+					uni.showToast({
+						title: '操作失败，请重试',
+						icon: 'none'
+					});
+				}
 			},
+
+			// 时间选择器变更处理
 			bindTimeChange(evt) {
-				const category = evt.currentTarget.dataset.index;
+				const type = evt.currentTarget.dataset.index; // 获取时间类型(start/end)
 				const value = evt.detail.value;
-				this[category] = value
+				this[type] = value; // 动态更新对应的时间字段
 			},
+
+			// 选择车辆打开弹窗
 			handleSelectVehicle(evt) {
-				const items = evt.currentTarget.dataset.item
+				const itemData = evt.currentTarget.dataset.item || {};
+				this.whether = false; // 标记为新增操作
 				this.c_send_key_show_momal = true;
 				this.g_uesr_details = {
-					...this.g_uesr_details, // 保留原对象所有属性
-					...items
+					...itemData
 				};
 			},
+
 			// 滚动到底部加载更多
-			lower(e) {
+			lower() {
 				if (!this.loading) {
 					this.loading = true;
 					this.g_page++;
-					setTimeout(() => {
-						this.initialCarList();
+					setTimeout(async () => {
+						await this.initialCarList();
 						this.loading = false;
 					}, 1000);
 				}
 			},
 
-
 			// 切换标签页
-			handleSwitchTab(evt) {
-				this.g_activeTab = evt
-				if (evt == 1) {
-					this.btnState = '新增'
-				}
+			handleSwitchTab(tabIndex) {
+				this.g_activeTab = tabIndex;
+				this.btnState = tabIndex === 1 ? '新增' : '其他状态'; // 根据需求调整
 			},
 
 			// 获取屏幕信息
@@ -472,7 +464,7 @@
 				try {
 					this.screenInfo = await info_screen();
 				} catch (error) {
-					console.error('[ScreenInfo] 获取屏幕信息失败:', error);
+					console.error('获取屏幕信息失败:', error);
 					uni.showToast({
 						title: '设备信息获取失败',
 						icon: 'none'
@@ -480,50 +472,61 @@
 				}
 			},
 
-			// 获取车辆列表
+			// 获取车辆列表（带分页）
 			async initialCarList() {
 				try {
 					const res = await u_getCarList({
 						page: this.g_page
 					});
 
-					// 已加载全部数据的提示
+					// 首次加载直接赋值，后续加载追加数据
+					if (this.g_page === 1) {
+						this.g_items = res?.content || [];
+					} else {
+						this.g_items = [...this.g_items, ...(res?.content || [])];
+					}
+
+					// 数据加载完毕提示
 					if (this.g_page > 1 && res.content.length === 0) {
 						uni.showToast({
-							title: `已加载全部数据：共${this.g_items.length}条`,
+							title: `已加载全部数据，共${this.g_items.length}条`,
 							icon: 'none'
 						});
 					}
-
-					// 合并新数据
-					this.g_items = this.g_items.concat(res?.content || [])
 				} catch (error) {
 					console.error('获取车辆列表失败:', error);
+					uni.showToast({
+						title: '数据加载失败',
+						icon: 'none'
+					});
 				}
 			},
+
 			// 获取车辆使用记录
 			async initRentRecord() {
-				u_rentRecord
 				try {
 					const res = await u_rentRecord();
-					let resp = res?.content
-					const temp = resp.map(ele => {
-						let list = []
-						list?.push({
-							time: ele?.startdate || "",
-							title: ele?.startAddress || '',
-						})
-						list?.push({
-							time: ele?.enddate || "",
-							title: ele?.endAddress || '',
-						})
-						ele.list = list
-						return ele
-					})
-					this.r_items = temp
+					const records = res?.content || [];
 
+					// 格式化记录数据
+					this.r_items = records.map(item => ({
+						...item,
+						list: [{
+								time: item.startdate,
+								title: item.startAddress
+							},
+							{
+								time: item.enddate,
+								title: item.endAddress
+							}
+						].filter(entry => entry.time) // 过滤空数据
+					}));
 				} catch (error) {
-					console.error('获取车辆列表失败:', error);
+					console.error('获取使用记录失败:', error);
+					uni.showToast({
+						title: '记录加载失败',
+						icon: 'none'
+					});
 				}
 			}
 		}
