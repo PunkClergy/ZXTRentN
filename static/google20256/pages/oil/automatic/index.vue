@@ -103,8 +103,9 @@
 		<view class="detection_button" @tap="handleGetOilButtonTap" v-if="vehicle_info?.platenumber">
 			<text>检测油量</text>
 		</view>
+		<!-- 检测油量 -->
 		<view class="modal-base-map" v-if="c_send_key_show_momal">
-			<form @submit="handleFormSubmit">
+			<form>
 				<view class="modal-container">
 					<view class="modal-container-head">
 						<text>检测完毕,请选择检测状态</text>
@@ -132,6 +133,70 @@
 				</view>
 			</form>
 		</view>
+		<!-- 还租选择订单 -->
+		<view class="modal-base-map" v-if="c_order_key_show_momal">
+			<form>
+				<view class="modal-container">
+					<view class="modal-container-head">
+						<text>请选择起租订单：</text>
+						<image src="/static/public/close.png" @tap="handleHideOrderModal" />
+					</view>
+					<view class="modal-container-middle">
+						<radio-group @change="handleRadioChange"
+							style="display: flex;align-items: center;flex-direction:column;gap: 30rpx;justify-content: center;">
+							<scroll-view scroll-y style="height: 100%;">
+								<block v-for="(item, index) in c_order_items" :key="item.id">
+									<label
+										style="display: flex;flex-direction: row;align-items: center;justify-content: center;">
+										<radio style="transform:scale(0.8)" :value="item.id" />
+										<view style="font-size: 28rpx;">
+											{{item.startdate + '   油量：'+item.startoil+'L'}}
+										</view>
+									</label>
+								</block>
+							</scroll-view>
+						</radio-group>
+					</view>
+					<view class="modal-container-footer">
+						<button style="background-color: #fff;color:#297DFE;"
+							@tap="handleStartRentingAgain">直接还租</button>
+						<button style="background-color: #297DFE;color: #fff;" @tap="handleStartOrder">选订单还租</button>
+					</view>
+				</view>
+			</form>
+		</view>
+		<!-- 选择油号 -->
+		<view class="modal-base-map" v-if="c_oilNumber_key_show_momal">
+			<form>
+				<view class="modal-container">
+					<view class="modal-container-head">
+						<text>请选择油号</text>
+						<image src="/static/public/close.png" @tap="handleHideOilNumberModal" />
+					</view>
+					<view class="modal-container-middle">
+						<radio-group @change="handleOilRadioChange"
+							style="display: flex;align-items: center;flex-direction:column;gap: 30rpx;justify-content: center;">
+							<scroll-view scroll-y style="height: 100%;">
+								<block v-for="(item, index) in c_oil_items" :key="item.id">
+									<label
+										style="display: flex;flex-direction: row;align-items: center;justify-content: center;">
+										<radio style="transform:scale(0.8)" :value="item.id" />
+										<view style="font-size: 28rpx;">
+											{{item?.name}}
+										</view>
+									</label>
+								</block>
+							</scroll-view>
+						</radio-group>
+					</view>
+					<view class="modal-container-footer">
+						<button style="background-color: #297DFE;color: #fff;"
+							@tap="handleOilStartRentingAgain">确认</button>
+					</view>
+				</view>
+			</form>
+		</view>
+
 	</view>
 
 </template>
@@ -141,7 +206,9 @@
 	import {
 		u_oilDipstickapiDipsticHistory,
 		u_dzBussinessMobileApiGetCarStatus,
-		u_dzBussinessMobileApiRentStart
+		u_dzBussinessMobileApiRentStart,
+		u_oilDipstickapiRentEnd,
+		u_oilDipstickapiGetOilPriceList
 	} from '@/api'
 	import CustomNavBar from "@/components/custom-header/index.vue";
 	import CircleProgressBar from '@/components/circle-progress-bar/circle-progress-bar.vue'
@@ -159,10 +226,16 @@
 				screenInfo: {}, // 屏幕信息对象
 				g_items: [], // 车辆列表数据
 				vehicle_info: {},
-				c_send_key_show_momal: false,
+				c_send_key_show_momal: false, //检测油量
+				c_order_key_show_momal: false, //选择订单
+				c_oilNumber_key_show_momal: false, //选择油号
 				g_uesr_details: {},
 				remaining_oil_quantity: 0,
-				proportion: 0
+				proportion: 0,
+				c_order_items: [],
+				c_oil_items: [],
+				rentSignId: 0,
+				rentOilSignId: 0
 			};
 		},
 		onLoad(options) {
@@ -276,6 +349,9 @@
 			handleHideSengKeyModal() {
 				this.c_send_key_show_momal = false
 			},
+			handleHideOrderModal() {
+				this.c_order_key_show_momal = false
+			},
 			// 起租
 			async handleStartingLease() {
 				try {
@@ -301,7 +377,109 @@
 
 				}
 			},
-			handleStillRenting() {},
+			async handleStillRenting() {
+				this.c_order_key_show_momal = true
+				this.c_send_key_show_momal = false
+
+				try {
+					const temp = {
+						vehId: this.vehicle_info?.id,
+						companyId: this.userInfo?.fin3CompanyId,
+						rentStatus: 0,
+					}
+
+					const res = await u_oilDipstickapiDipsticHistory(temp);
+					this.c_order_items = res?.content
+				} catch (error) {
+					console.error('[ScreenInfo] 获取记录失败:', error);
+
+				}
+			},
+			handleRadioChange(evt) {
+				this.rentSignId = evt?.detail?.value
+			},
+			handleOilRadioChange(evt) {
+				this.rentOilSignId = evt?.detail?.value
+			},
+			// 直接还租
+			async handleStartRentingAgain() {
+				try {
+					const temp = {
+						vehId: this.vehicle_info?.id,
+						oil: this.remaining_oil_quantity,
+						checkerName: this.userCompanyName
+					}
+
+					const res = await u_oilDipstickapiRentEnd(temp);
+					if (res?.code == 1000) {
+						this.c_order_key_show_momal = false
+						uni.showModal({
+							title: '提示',
+							content: res?.msg,
+							showCancel: false,
+						});
+					}
+				} catch (error) {
+					console.error('[ScreenInfo] 获取记录失败:', error);
+
+				}
+
+			},
+
+			async handleStartOrder() {
+				if (this.rentSignId) {
+					try {
+						const res = await u_oilDipstickapiGetOilPriceList();
+						if (res?.code == 1000) {
+							this.c_order_key_show_momal = false
+							this.c_oilNumber_key_show_momal = true
+							this.c_oil_items = res?.content
+						}
+					} catch (error) {
+						console.error('[ScreenInfo] 获取记录失败:', error);
+					}
+
+				} else {
+					uni.showToast({
+						title: '请选择订单',
+						icon: 'none',
+						duration: 2000
+					});
+				}
+			},
+			async handleOilStartRentingAgain() {
+				console.log(this.rentOilSignId)
+				if (this.rentOilSignId) {
+					try {
+						const temp = {
+							vehId: this.vehicle_info?.id,
+							oil: this.remaining_oil_quantity,
+							id: this.rentSignId,
+							checkerName: this.userCompanyName,
+							oilPrice: this.rentOilSignId
+						}
+
+						const res = await u_oilDipstickapiRentEnd(temp);
+						if (res?.code == 1000) {
+							this.c_oilNumber_key_show_momal = false
+							uni.showModal({
+								title: '提示',
+								content: res?.msg,
+								showCancel: false,
+							});
+						}
+					} catch (error) {
+						console.error('[ScreenInfo] 获取记录失败:', error);
+
+					}
+				} else {
+					uni.showToast({
+						title: '请选择油号',
+						icon: 'none',
+						duration: 2000
+					})
+				}
+			},
 		}
 	};
 </script>
