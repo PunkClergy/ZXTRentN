@@ -27,7 +27,8 @@
 					</view>
 				</view>
 			</view>
-			<scroll-view scroll-y class="scroll-container">
+			<scroll-view scroll-y class="scroll-container"
+				:style="{ height: vehicle_info?.platenumber ? '70vh' : '80vh' }">
 				<block v-for="(item,index) in g_items">
 					<view class="record-card">
 						<view class="record-header">
@@ -125,20 +126,22 @@
 						</circle-progress-bar>
 					</view>
 					<view class="modal-container-footer">
-						<button formType="submit">确认</button>
-						<button formType="submit">确认</button>
+						<button style="background-color: #fff;color:#297DFE;" @tap="handleStartingLease">起租</button>
+						<button style="background-color: #297DFE;color: #fff;" @tap="handleStillRenting">还租</button>
 					</view>
 				</view>
 			</form>
 		</view>
 	</view>
+
 </template>
 
 
 <script>
 	import {
 		u_oilDipstickapiDipsticHistory,
-		u_dzBussinessMobileApiGetCarStatus
+		u_dzBussinessMobileApiGetCarStatus,
+		u_dzBussinessMobileApiRentStart
 	} from '@/api'
 	import CustomNavBar from "@/components/custom-header/index.vue";
 	import CircleProgressBar from '@/components/circle-progress-bar/circle-progress-bar.vue'
@@ -175,6 +178,13 @@
 			this.initialScreenInfo()
 		},
 		computed: {
+			// 当前用户信息
+			userInfo() {
+				return uni.getStorageSync('user_info') || null
+			},
+			userCompanyName() {
+				return this.userInfo?.companyName?.trim() || '未知'
+			},
 			// 状态栏高度
 			statusBarHeight() {
 				return this.screenInfo.statusBarHeight || 0;
@@ -228,7 +238,7 @@
 				this.c_send_key_show_momal = true;
 				try {
 					const res = await u_dzBussinessMobileApiGetCarStatus({
-						sn: '640019899'
+						sn: this.vehicle_info?.xsgw
 					});
 
 					const info = res?.content || {};
@@ -249,6 +259,7 @@
 					const total = this.vehicle_info?.xsgw || 0;
 					const oilProgress = total > 0 ? this.remaining_oil_quantity / total : 0;
 					this.proportion = Math.max(0, oilProgress); // 确保在0-100范围内
+					console.log(this.vehicle_info)
 					console.log(5656567675, total, Math.max(0, Math.round(oilProgress * 100)))
 
 				} catch (error) {
@@ -264,10 +275,33 @@
 			},
 			handleHideSengKeyModal() {
 				this.c_send_key_show_momal = false
-			}
+			},
+			// 起租
+			async handleStartingLease() {
+				try {
+					const temp = {
+						vehId: this.vehicle_info?.id,
+						sn: this.vehicle_info?.sn,
+						oil: this.remaining_oil_quantity,
+						checkerName: this.userCompanyName
+					}
 
+					const res = await u_dzBussinessMobileApiRentStart(temp);
+					if (res?.code == 1000) {
+						this.initDipsticHistory()
+						this.c_send_key_show_momal = false
+						uni.showModal({
+							title: '提示',
+							content: '起租成功',
+							showCancel: false,
+						});
+					}
+				} catch (error) {
+					console.error('[ScreenInfo] 获取记录失败:', error);
 
-
+				}
+			},
+			handleStillRenting() {},
 		}
 	};
 </script>
@@ -277,6 +311,7 @@
 		padding: 10rpx 0rpx;
 		background-image: url(/static/public/car-bg.png);
 		background-size: cover;
+
 	}
 
 	/* 记录容器 */
@@ -292,7 +327,7 @@
 
 	.scroll-container {
 		background-color: aliceblue;
-		min-height: 80vh;
+
 		width: 98%;
 	}
 
@@ -468,8 +503,9 @@
 	}
 
 	.detection_button {
-		position: absolute;
-		bottom: 60px;
+		/* position: absolute;
+		bottom: 60px; */
+		margin-top: 30rpx;
 		width: 100%;
 		display: flex;
 		justify-content: center;
@@ -542,7 +578,6 @@
 	}
 
 	.modal-container-footer button {
-		background: linear-gradient(88deg, #1576dc, #1b64b1);
 		box-shadow: 0rpx 1rpx 13rpx 0rpx rgba(51, 63, 92, 0.31);
 		border-radius: 36rpx;
 		font-weight: bold;
