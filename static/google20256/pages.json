@@ -17,11 +17,6 @@
 			"style": {
 				"navigationBarTitleText": "车辆清单MCCK设备绑定"
 			}
-		}, {
-			"path": "pages/GPSTrajectory/GPSTrajectory",
-			"style": {
-				"navigationBarTitleText": "GPS轨迹"
-			}
 		},
 		{
 			"path": "pages/system/account/transfer/index",
@@ -73,23 +68,34 @@
 			}
 		},
 		{
-			"path": "pages/login/login" //登录
-		},
-		{
-			"path": "pages/register/register" //注册
-		},
-		{
-			"path" : "pages/improveData/contactUs/index",
-			"style" : 
-			{
-				"navigationBarTitleText" : ""
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登录"
 			}
 		},
 		{
-			"path" : "pages/improveData/installer/index",
+			"path": "pages/register/register",
+			"style": {
+				"navigationBarTitleText": "注册"
+			}
+		},
+		{
+			"path": "pages/improveData/contactUs/index",
+			 "style": {
+			 	"navigationBarTitleText": "税务和发票资料"
+			 }
+		},
+		{
+			"path": "pages/improveData/installer/index",
+			 "style": {
+			 	"navigationBarTitleText": "安装商查询"
+			 }
+		},
+		{
+			"path" : "pages/improveData/shops/index",
 			"style" : 
 			{
-				"navigationBarTitleText" : ""
+				"navigationBarTitleText" : "商铺地址"
 			}
 		}
 	],
