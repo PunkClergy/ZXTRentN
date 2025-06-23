@@ -13,7 +13,8 @@
 
 			<view class="action-buttons">
 				<button class="action-btn" @click="copyLink">复制链接</button>
-				<button class="action-btn contact-btn" @click="contactUs">联系我们</button>
+				<!-- 可以使用contactUs方法直接拨打电话 -->
+				<button class="action-btn contact-btn" @click="showModal">联系我们</button>
 			</view>
 
 			<view class="tip-text">
@@ -26,7 +27,8 @@
 
 <script>
 	import {
-		u_shopapiList
+		u_shopapiList,
+		u_addMessage
 	} from '@/api'
 	import CustomNavBar from "@/components/custom-header/index.vue";
 	import {
@@ -70,6 +72,27 @@
 			}
 		},
 		methods: {
+			showModal() {
+				uni.showModal({
+					title: '输入内容',
+					content: '',
+					editable: true, // 开启输入框
+					placeholderText: '请输入内容...',
+					success: async (res) => {
+						if (res.confirm) {
+							const respone = await u_addMessage({
+								message: res.content
+							});
+							if (respone?.code == 1000) {
+								uni.showToast({
+									title: respone?.msg,
+									icon: 'none'
+								})
+							}
+						}
+					}
+				})
+			},
 			// 预览二维码大图
 			previewQrcode() {
 				if (this.info?.qrcode) {
