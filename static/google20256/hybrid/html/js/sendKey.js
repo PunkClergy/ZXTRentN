@@ -233,7 +233,8 @@ function handleMarkerSelection(marker, index) {
     uni.postMessage({
         data: {
             type: 'sn',
-            sn: marker?.sn
+            sn: marker?.sn,
+			plateNumber:marker?.plateNumber
         }
     });
 }
