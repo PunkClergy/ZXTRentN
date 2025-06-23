@@ -77,6 +77,13 @@
 		},
 		{
 			"path": "pages/register/register" //注册
+		},
+		{
+			"path" : "pages/improveData/contactUs/index",
+			"style" : 
+			{
+				"navigationBarTitleText" : ""
+			}
 		}
 	],
 	"globalStyle": {
