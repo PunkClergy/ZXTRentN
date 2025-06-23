@@ -61,6 +61,18 @@
 			}
 		},
 		{
+			"path": "pages/carRental/carPosition/index",
+			"style": {
+				"navigationBarTitleText": "GPS位置"
+			}
+		},
+		{
+			"path": "pages/carRental/carTrajectory/index",
+			"style": {
+				"navigationBarTitleText": "GPS轨迹"
+			}
+		},
+		{
 			"path": "pages/login/login" //登录
 		},
 		{
