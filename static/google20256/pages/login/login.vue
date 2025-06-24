@@ -45,7 +45,7 @@
 
 					// 跳转到首页或其他页面
 					uni.reLaunch({
-						url: '/pages/index/index'
+						url: '/pages/desk/desk'
 					});
 				} catch (error) {
 					uni.showToast({

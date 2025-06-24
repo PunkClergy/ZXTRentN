@@ -33,7 +33,7 @@
 					<view class="menu-grid">
 						<view v-for="(item, itemIndex) in page" :key="`menu-${item.id || itemIndex}`" class="menu-item"
 							@tap="handleMenuItemTap(item)">
-							<view class="menu-item-current">
+							<view class="menu-item-current" :class="{ currentActive: currentQuick === item.id }">
 								<image :src="getMenuIconUrl(item.icon)" mode="scaleToFill" class="menu-icon"
 									@error="handleMenuIconError(item.id)" />
 								<text class="menu-text">{{ item.name }}</text>
@@ -458,7 +458,30 @@
 
 			// 子菜单项点击
 			handleChildItemTap(item) {
-				console.log((item))
+				if (item.name == '退出登录') {
+					uni.showModal({
+						title: '提示',
+						content: '确定退出当前账号？',
+						success: (res) => {
+							if (res.confirm) {
+								uni.clearStorageSync();
+								uni.reLaunch({
+									url: '/pages/desk/desk', // 替换成你的首页实际路径
+									success: () => {
+										console.log("跳转到首页成功");
+									},
+									fail: (err) => {
+										console.error("跳转到首页失败：", err);
+									}
+								});
+							} else if (res.cancel) {
+								console.log('用户点击取消');
+								// 这里写取消后的逻辑
+							}
+						}
+					});
+					return
+				}
 				if (item.path) {
 					uni.navigateTo({
 						url: item.path
@@ -704,7 +727,7 @@
 	}
 
 	.login-btn {
-		background-color: red;
+		background-color: aliceblue;
 		color: white;
 	}
 
@@ -831,5 +854,12 @@
 		font-size: 26rpx;
 		margin-top: 10rpx;
 		color: #333;
+	}
+
+	.currentActive {
+		background: rgb(169, 169, 169);
+		min-height: 80%;
+		color: #fff;
+		border-radius: 8rpx;
 	}
 </style>
