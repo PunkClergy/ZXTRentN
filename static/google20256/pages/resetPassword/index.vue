@@ -3,38 +3,70 @@
 		<CustomNavBar title="修改用户名密码" />
 		<!-- 主容器 -->
 		<view class="record-container" :style="'margin-top: ' + (navbarTotalHeight) + 'px;'">
+			<view class="record-tabs">
+				<view class="record-tabs-item" :class="(g_activeTab==1? 'tabs-active-1' : 'tabs-no-active-1')"
+					@tap="handleSwitchTab(1)">修改用户名</view>
+				<view class="record-tabs-item" :class="(g_activeTab==2? 'tabs-active-2' : 'tabs-no-active-2')"
+					@tap="handleSwitchTab(2)">
+					修改密码
+				</view>
+			</view>
 			<view class="form-container">
-				<view class="input-group">
-					<text class="label">原密码</text>
-					<view class="input-wrapper">
-						<input class="input" :type="showOldPassword ? 'text' : 'password'" v-model="form.oldPassword"
-							placeholder="请输入原密码" placeholder-class="placeholder" password-icon />
-						<image :src="showOldPassword ? '/static/public/eye-open.png' : '/static/public/eye-close.png'"
-							class="eye-icon" @click="showOldPassword = !showOldPassword" />
+				<block v-if="g_activeTab == 1">
+					<view class="input-group">
+						<text class="label">用户名</text>
+						<view class="input-wrapper">
+							<input class="input" type="text" v-model="form.UserName" placeholder="请输入用户名"
+								placeholder-class="placeholder" password-icon />
+						</view>
 					</view>
-				</view>
+					<view class="input-group">
+						<text class="label">确认用户名</text>
+						<view class="input-wrapper">
+							<input class="input" type="text" v-model="form.newUserName" placeholder="请再次输入用户名"
+								placeholder-class="placeholder" password-icon />
+						</view>
+					</view>
+				</block>
+				<block v-else>
+					<view class="input-group">
+						<text class="label">原密码</text>
+						<view class="input-wrapper">
+							<input class="input" :type="showOldPassword ? 'text' : 'password'"
+								v-model="form.oldPassword" placeholder="请输入原密码" placeholder-class="placeholder"
+								password-icon />
+							<image
+								:src="showOldPassword ? '/static/public/eye-open.png' : '/static/public/eye-close.png'"
+								class="eye-icon" @click="showOldPassword = !showOldPassword" />
+						</view>
+					</view>
 
-				<view class="input-group">
-					<text class="label">新密码</text>
-					<view class="input-wrapper">
-						<input class="input" :type="showNewPassword ? 'text' : 'password'" v-model="form.newPassword"
-							placeholder="8-20位字母数字组合" placeholder-class="placeholder" password-icon />
-						<image :src="showNewPassword ? '/static/public/eye-open.png' : '/static/public/eye-close.png'"
-							class="eye-icon" @click="showNewPassword = !showNewPassword" />
+					<view class="input-group">
+						<text class="label">新密码</text>
+						<view class="input-wrapper">
+							<input class="input" :type="showNewPassword ? 'text' : 'password'"
+								v-model="form.newPassword" placeholder="8-20位字母数字组合" placeholder-class="placeholder"
+								password-icon />
+							<image
+								:src="showNewPassword ? '/static/public/eye-open.png' : '/static/public/eye-close.png'"
+								class="eye-icon" @click="showNewPassword = !showNewPassword" />
+						</view>
 					</view>
-				</view>
 
-				<view class="input-group">
-					<text class="label">确认密码</text>
-					<view class="input-wrapper">
-						<input class="input" :type="showConfirmPassword ? 'text' : 'password'"
-							v-model="form.confirmPassword" placeholder="请再次输入新密码" placeholder-class="placeholder"
-							password-icon />
-						<image
-							:src="showConfirmPassword ? '/static/public/eye-open.png' : '/static/public/eye-close.png'"
-							class="eye-icon" @click="showConfirmPassword = !showConfirmPassword" />
+					<view class="input-group">
+						<text class="label">确认密码</text>
+						<view class="input-wrapper">
+							<input class="input" :type="showConfirmPassword ? 'text' : 'password'"
+								v-model="form.confirmPassword" placeholder="请再次输入新密码" placeholder-class="placeholder"
+								password-icon />
+							<image
+								:src="showConfirmPassword ? '/static/public/eye-open.png' : '/static/public/eye-close.png'"
+								class="eye-icon" @click="showConfirmPassword = !showConfirmPassword" />
+						</view>
 					</view>
-				</view>
+
+
+				</block>
 
 				<button class="submit-btn" :disabled="submitting" @click="handleSubmit">
 					{{ submitting ? '提交中...' : '确认修改' }}
@@ -50,7 +82,8 @@
 		info_screen
 	} from '@/utils/scheme/screen.js'
 	import {
-		u_updatePassword
+		u_updatePassword,
+		u_updateUserName
 	} from '@/api' // 密码修改API
 
 	export default {
@@ -60,15 +93,12 @@
 		data() {
 			return {
 				screenInfo: {}, // 屏幕信息对象
-				form: {
-					oldPassword: '',
-					newPassword: '',
-					confirmPassword: ''
-				},
+				form: {},
 				showOldPassword: false, // 控制原密码显示
 				showNewPassword: false, // 控制新密码显示
 				showConfirmPassword: false, // 控制确认密码显示
-				submitting: false // 防止重复提交
+				submitting: false, // 防止重复提交
+				g_activeTab: 1,
 			};
 		},
 		onLoad(options) {
@@ -78,6 +108,10 @@
 			this.initialScreenInfo()
 		},
 		computed: {
+			// 当前用户信息
+			userInfo() {
+				return uni.getStorageSync('user_info') || null
+			},
 			// 状态栏高度
 			statusBarHeight() {
 				return this.screenInfo.statusBarHeight || 0;
@@ -108,7 +142,10 @@
 					});
 				}
 			},
-
+			// 切换标签页
+			handleSwitchTab(evt) {
+				this.g_activeTab = evt
+			},
 			// 表单验证
 			validateForm() {
 				if (!this.form.oldPassword) {
@@ -157,44 +194,92 @@
 			// 提交表单
 			async handleSubmit() {
 				if (this.submitting) return;
-				if (!this.validateForm()) return;
-
 				this.submitting = true;
 
 				try {
-					const params = {
-						oldPassword: this.form.oldPassword,
-						newPassword: this.form.newPassword
-					};
+					if (this.g_activeTab === 1) {
+						await this.handleUsernameUpdate();
+					} else {
+						await this.handlePasswordUpdate();
+					}
+				} finally {
+					this.submitting = false;
+				}
+			},
 
-					const res = await u_updatePassword(params);
+			// 用户名修改逻辑
+			async handleUsernameUpdate() {
+				if (this.form?.UserName !== this.form?.newUserName) {
+					uni.showToast({
+						title: '两次输入用户名不一致',
+						icon: 'none'
+					});
+					return;
+				}
 
-					if (res.code === 200) {
-						uni.showToast({
-							title: '密码修改成功',
-							icon: 'success',
-							duration: 1500,
-							success: () => {
-								setTimeout(() => {
-									uni.navigateBack();
-								}, 1500);
-							}
-						});
+				const params = {
+					newUserName: this.form.newUserName,
+					userId: this.userInfo?.id
+				};
+
+				await this.executeUpdate(
+					u_updateUserName,
+					params,
+					'用户名修改成功',
+					'用户名修改失败'
+				);
+			},
+
+			// 密码修改逻辑
+			async handlePasswordUpdate() {
+				if (!this.validateForm()) return;
+
+				const params = {
+					oldPassword: this.form.oldPassword,
+					newPassword: this.form.newPassword,
+					userId: this.userInfo?.id
+				};
+
+				await this.executeUpdate(
+					u_updatePassword,
+					params,
+					'密码修改成功',
+					'密码修改失败'
+				);
+			},
+
+			// 统一请求处理器
+			async executeUpdate(apiFunc, params, successMsg, errorMsg) {
+				try {
+					const res = await apiFunc(params);
+
+					if (res.code === 1000) {
+						this.showSuccessToast(successMsg);
 					} else {
 						uni.showToast({
-							title: res.message || '密码修改失败',
+							title: res.message || errorMsg,
 							icon: 'none'
 						});
 					}
 				} catch (error) {
-					console.error('修改密码失败:', error);
+					console.error(`${errorMsg}:`, error);
 					uni.showToast({
 						title: '请求失败，请稍后重试',
 						icon: 'none'
 					});
-				} finally {
-					this.submitting = false;
 				}
+			},
+
+			// 成功提示通用逻辑
+			showSuccessToast(message) {
+				uni.showToast({
+					title: message,
+					icon: 'none',
+					duration: 1500,
+					success: () => {
+						setTimeout(() => uni.navigateBack(), 1500);
+					}
+				});
 			}
 		}
 	};
@@ -208,30 +293,33 @@
 		background-size: cover;
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		justify-content: center;
+		/* align-items: center; */
+		/* justify-content: center; */
 	}
 
 	/* 记录容器 */
 	.record-container {
-		width: 90%;
+
 		height: auto;
-		min-height: 83vh;
-		margin: 20rpx auto;
+		min-height: 90vh;
 		border-radius: 24rpx;
 		background-color: rgba(255, 255, 255, 0.95);
 		box-shadow: 0 8rpx 30rpx rgba(0, 0, 0, 0.15);
 		display: flex;
-		align-items: center;
 		flex-direction: column;
-		padding: 40rpx 30rpx;
 		gap: 50rpx;
+		width: 98%;
+		position: relative;
+		border-radius: 12rpx;
+
 	}
 
+
 	.form-container {
-		width: 100%;
+		width: 90%;
 		display: flex;
 		flex-direction: column;
+		margin: 0 auto;
 		gap: 40rpx;
 	}
 
@@ -292,5 +380,42 @@
 
 	.submit-btn:disabled {
 		background: #a0cfff;
+	}
+
+	/* 标签栏样式 */
+	.record-tabs {
+		display: flex;
+		height: 50px;
+	}
+
+	.record-tabs-item {
+		border-radius: 12rpx;
+		width: 50%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background-size: cover;
+		background-position: center;
+		font-family: PingFang SC;
+		font-weight: bold;
+		font-size: 28rpx;
+		color: #010101;
+	}
+
+	/* 标签激活状态样式 */
+	.tabs-active-1 {
+		background-image: url(/static/tabs/2-1.png);
+	}
+
+	.tabs-no-active-1 {
+		background-image: url(/static/tabs/1-1.png);
+	}
+
+	.tabs-active-2 {
+		background-image: url(/static/tabs/1-2.png);
+	}
+
+	.tabs-no-active-2 {
+		background-image: url(/static/tabs/2-2.png);
 	}
 </style>
