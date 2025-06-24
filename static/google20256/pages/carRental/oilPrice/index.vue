@@ -115,17 +115,15 @@
 					fwSet: this.fwSetItems,
 					oilSet: this.oilSetItems
 				}
-				console.log(temp)
 				try {
 					const res = await u_saveOilSet(temp);
+					console.log(1122, res)
 					if (res?.code == 1000) {
 						uni.showToast({
 							title: res?.msg,
 							icon: 'none'
 						});
-						uni.reLaunch({
-							url: '/pages/desk/desk'
-						})
+
 					}
 				} catch (error) {
 					console.error('保存失败:', error);
@@ -139,7 +137,7 @@
 						const oilSet = res?.content?.oilSet;
 						const fwSet = res?.content?.fwSet;
 						this.oilSetItems = Object.entries(oilSet).map(([key, value]) => ({
-							name: parseInt(key, 10),
+							name: key,
 							value: value
 						}))
 						this.fwSetItems = Object.entries(fwSet).map(([key, value]) => ({
@@ -166,10 +164,12 @@
 			// 统一处理输入事件
 			handleInput(e, dataset, index, field) {
 				const value = e.detail.value;
-				this[dataset][index][field] = value;
-				this.setData({
-					[dataset]: this[dataset]
-				});
+				const newArray = [...this[dataset]];
+				newArray[index] = {
+					...newArray[index],
+					[field]: value
+				};
+				this[dataset] = newArray;
 			},
 
 			// 添加汽油条目
