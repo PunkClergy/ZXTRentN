@@ -6,7 +6,7 @@
 	<view class="nav-bar" :style="{ height: navBarHeight + 'px' }">
 		<view class="nav-content">
 			<!-- 返回按钮 -->
-			<image src="/static/public/left.png" class="action-icon back-icon" @click="handleBack"></image>
+			<image src="/static/public/nav_left.png" class="action-icon back-icon" @click="handleBack"></image>
 
 			<!-- 首页按钮 -->
 			<image src="/static/public/home.png" class="action-icon home-icon" @tap="handleHome"></image>
@@ -104,8 +104,8 @@
 
 	/* 操作图标通用样式 */
 	.action-icon {
-		width: 44rpx;
-		height: 44rpx;
+		width: 50rpx;
+		height: 50rpx;
 	}
 
 	/* 返回按钮 */

@@ -230,7 +230,7 @@ http.setInterceptor({
 	},
 	response: (response) => {
 		// 处理响应状态码
-		if (response.data.code === 401) {
+		if (response.data.code === 9000) {
 			// token过期处理
 			uni.navigateTo({
 				url: '/pages/login/login'

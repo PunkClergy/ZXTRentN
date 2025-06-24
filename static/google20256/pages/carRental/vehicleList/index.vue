@@ -270,7 +270,7 @@
 					const res = await u_getCarList({
 						page: this.g_page
 					});
-
+console.log(111111,res)
 					// 已加载全部数据的提示
 					if (this.g_page > 1 && res.content.length === 0) {
 						uni.showToast({

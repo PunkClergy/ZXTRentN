@@ -6,7 +6,7 @@
 		<view class="nav-bar" :style="{ height: navBarHeight + 'px' }"
 			style="display: flex;gap: 100rpx;justify-content: flex-start">
 			<view style="display: flex;align-items: center;gap: 30rpx;">
-				<image src="/static/public/left.png" class="action-icon back-icon" 
+				<image src="/static/public/nav_left.png" class="action-icon back-icon" 
 					@click="handleBack"></image>
 				<image src="/static/public/home.png" class="action-icon home-icon"
 					@tap="handleHome"></image>
@@ -134,5 +134,9 @@
 		width: 50rpx;
 		height: 50rpx;
 		flex-shrink: 0;
+	}
+	.back-icon{
+		width: 55rpx;
+		height: 55rpx;
 	}
 </style>

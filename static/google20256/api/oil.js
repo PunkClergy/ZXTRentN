@@ -6,5 +6,8 @@ export const u_dzBussinessMobileApiGetCarStatus = (data) => http.postFormData('/
 export const u_dzBussinessMobileApiRentStart = (data) => http.get('/oilDipstickapi/rentStart', data) //起租
 export const u_oilDipstickapiRentEnd = (data) => http.get('/oilDipstickapi/rentEnd', data) //选择起租订单
 export const u_oilDipstickapiGetOilPriceList = (data) => http.get('/oilDipstickapi/getOilPriceList', data) //选择起租订单
+export const u_getOilSet = (data) => http.get('/oilDipstickapi/getOilSet', data) //获取油价
+export const u_saveOilSet = (data) => http.postFormData('/oilDipstickapi/saveOilSet', data) //保存设置
+
 
 

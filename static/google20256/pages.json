@@ -97,6 +97,20 @@
 			{
 				"navigationBarTitleText" : "商铺地址"
 			}
+		},
+		{
+			"path" : "pages/carRental/oilPrice/index",
+			"style" : 
+			{
+				"navigationBarTitleText" : "油价"
+			}
+		},
+		{
+			"path" : "pages/resetPassword/index",
+			"style" : 
+			{
+				"navigationBarTitleText" : "修改用户名密码"
+			}
 		}
 	],
 	"globalStyle": {
