@@ -2,6 +2,7 @@
 <template>
 	<!-- index.wxml -->
 	<view class="container">
+				<CustomNavBar title="登录" />
 		<!-- 上部分：登录区域 -->
 		<view class="login-area">
 			<!-- Logo 区域 -->
@@ -56,7 +57,7 @@
 		login,
 		u_getQrcodeImg
 	} from '@/api';
-
+	import CustomNavBar from "@/components/custom-header/index.vue";
 	export default {
 		data() {
 			return {
@@ -65,6 +66,9 @@
 				isSubmitting: false,
 				init_qr_code: ''
 			};
+		},
+		components: {
+			CustomNavBar
 		},
 		mounted() {
 			this.infinityGetQrcodeImg()
