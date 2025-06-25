@@ -248,7 +248,7 @@ function clearMarkers() {
 }
 
 // 按钮事件绑定
-document.getElementById('btn').addEventListener('click', () => {
+document.getElementById('btn1').addEventListener('click', () => {
     uni.postMessage({
         data: {
             source: 1
@@ -256,10 +256,34 @@ document.getElementById('btn').addEventListener('click', () => {
     });
 });
 
-document.getElementById('btn1').addEventListener('click', () => {
+document.getElementById('btn3').addEventListener('click', () => {
     uni.postMessage({
         data: {
-            source: 2,
+            source: 3,
+            payload: info
+        }
+    });
+});
+document.getElementById('btn5').addEventListener('click', () => {
+    uni.postMessage({
+        data: {
+            source: 5,
+            payload: info
+        }
+    });
+});
+document.getElementById('btn8').addEventListener('click', () => {
+    uni.postMessage({
+        data: {
+            source: 8,
+            payload: info
+        }
+    });
+});
+document.getElementById('btn6').addEventListener('click', () => {
+    uni.postMessage({
+        data: {
+            source: 6,
             payload: info
         }
     });
