@@ -234,13 +234,13 @@
 						console.log('寻车操作');
 						this.handleVehicle(source);
 					},
-					'btnSee': () => {
-						console.log('查看照片，跳转');
-						this.handlePhotoView();
+					8: () => {
+						console.log('风控拦截');
+						this.handleVehicle(source);
 					},
-					'btnReturn': () => {
-						console.log('归还车辆，跳转');
-						this.handleReturnVehicle();
+					6: () => {
+						console.log('取消拦截');
+						this.handleVehicle(source);
 					}
 				};
 
