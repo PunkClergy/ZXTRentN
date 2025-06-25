@@ -633,7 +633,7 @@
 		},
 
 		// 生命周期钩子
-		async onShow() {
+		async onLoad() {
 			this.isLoading = true;
 			uni.hideTabBar({
 				animation: true
