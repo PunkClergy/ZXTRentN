@@ -38,7 +38,7 @@
 
 			<!-- 滚动容器：显示油量检测记录 -->
 			<scroll-view scroll-y class="scroll-container"
-				:style="{ height: vehicle_info?.platenumber ? '70vh' : '80vh' }">
+				:style="{ height:'80vh' }">
 				<!-- 遍历显示每一条油量检测记录 -->
 				<block v-for="(item,index) in g_items">
 					<view class="record-card">
@@ -117,13 +117,15 @@
 						</view>
 					</view>
 				</block>
+			
 			</scroll-view>
+			<!-- 检测油量按钮 -->
+			<view class="detection_button" @tap="handleGetOilButtonTap" v-if="vehicle_info?.platenumber">
+				<text>检测油量</text>
+			</view>
 		</view>
 
-		<!-- 检测油量按钮 -->
-		<view class="detection_button" @tap="handleGetOilButtonTap" v-if="vehicle_info?.platenumber">
-			<text>检测油量</text>
-		</view>
+
 
 		<!-- 油量检测结果弹窗 -->
 		<view class="modal-base-map" v-if="c_send_key_show_momal">
@@ -566,12 +568,14 @@
 		display: flex;
 		flex-direction: column;
 		gap: 10rpx;
+		position: relative;
 	}
 
 	/* 滚动容器样式 */
 	.scroll-container {
 		background-color: aliceblue;
 		width: 98%;
+
 	}
 
 	/* 卡片通用样式 */
@@ -743,7 +747,8 @@
 
 	/* 检测按钮样式 */
 	.detection_button {
-		margin-top: 30rpx;
+		position: absolute;
+		bottom: 30rpx;
 		width: 100%;
 		display: flex;
 		justify-content: center;

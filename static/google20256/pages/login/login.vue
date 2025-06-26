@@ -2,7 +2,7 @@
 <template>
 	<!-- index.wxml -->
 	<view class="container">
-				<CustomNavBar title="登录" />
+		<CustomNavBar title="登录" />
 		<!-- 上部分：登录区域 -->
 		<view class="login-area">
 			<!-- Logo 区域 -->
@@ -27,8 +27,9 @@
 					<view class="input-label">密码</view>
 					<input class="input-field" placeholder="请输入密码" v-model="password" :password="true" />
 				</view>
-				<view @tap="handleLogin">
-					<button class="login-btn">登录</button>
+				<view>
+					<button class="login-btn" @tap="handleLogin">登录</button>
+					<text class="register" @tap="handleRegister">注册账号</text>
 				</view>
 			</view>
 
@@ -146,6 +147,11 @@
 				} finally {
 					this.isSubmitting = false;
 				}
+			},
+			handleRegister(){
+				uni.navigateTo({
+					url:'/pages/register/register'
+				})
 			}
 		}
 	};
@@ -395,5 +401,12 @@
 
 	.btn_tapcolor {
 		opacity: 0.8;
+	}
+
+	.register {
+		float: right;
+		margin-top: 10rpx;
+		color: #fff;
+		font-size: 26rpx;
 	}
 </style>
