@@ -15,8 +15,8 @@
 			<!-- 注册表单 -->
 			<view class="input-group">
 				<view class="input-item">
-					<view class="input-label">账号</view>
-					<input class="input-field" placeholder="请输入账号" v-model="username" />
+					<view class="input-label">手机号</view>
+					<input class="input-field" placeholder="请输入手机号" v-model="phone" type="number" />
 				</view>
 				<view class="input-item">
 					<view class="input-label">密码</view>
@@ -26,10 +26,7 @@
 					<view class="input-label">确认密码</view>
 					<input class="input-field" placeholder="请再次输入密码" v-model="confirmPassword" :password="true" />
 				</view>
-				<view class="input-item">
-					<view class="input-label">手机号</view>
-					<input class="input-field" placeholder="请输入手机号" v-model="phone" type="number" />
-				</view>
+
 				<view class="input-item">
 					<view class="input-label">验证码</view>
 					<input class="input-field" placeholder="请输入验证码" v-model="smsCode" />
@@ -84,7 +81,7 @@
 				
 				try {
 					// 调用获取验证码API
-					await getSmsCode({ phone: this.phone, type: 1 });
+					await u_getSmsCode({ mobile: this.phone });
 					uni.showToast({ title: '验证码已发送', icon: 'none' });
 					
 					// 开始倒计时
@@ -112,10 +109,6 @@
 			
 			// 表单验证
 			validateForm() {
-				if (!this.username) {
-					uni.showToast({ title: '请输入用户名', icon: 'none' });
-					return false;
-				}
 				if (!this.password) {
 					uni.showToast({ title: '请输入密码', icon: 'none' });
 					return false;
@@ -151,20 +144,19 @@
 				this.isSubmitting = true;
 				
 				try {
-					const response = await register({
-						username: this.username,
+					const response = await u_register({
 						password: this.password,
-						phone: this.phone,
-						smsCode: this.smsCode
+						mobile: this.phone,
+						yzcode: this.smsCode
 					});
-					
+					console.log(response)
 					if (response.code === 1000) {
 						uni.showToast({ title: '注册成功' });
 						setTimeout(() => {
 							uni.navigateBack();
-						}, 1500);
+						}, 3000);
 					} else {
-						uni.showToast({ title: response.message || '注册失败', icon: 'none' });
+						uni.showToast({ title: response.msg || '注册失败', icon: 'none' });
 					}
 				} catch (error) {
 					uni.showToast({ title: '请求失败，请稍后重试', icon: 'none' });

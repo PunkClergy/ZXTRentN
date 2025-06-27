@@ -60,7 +60,7 @@
 				this.$emit('home');
 				console.log((uni))
 				uni.switchTab({
-					url: '/pages/index/index'
+					url: '/pages/desk/desk'
 				});
 			}
 		},
