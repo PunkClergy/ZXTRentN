@@ -52,7 +52,15 @@ export const langs = {
 		pleasename: '请输入姓名',
 		pleasepassword: '请输入密码',
 		pleasemobile: '请输入手机号',
-		transferadmin:'移交管理员'
+		transferadmin:'移交管理员',
+		sendkey:'发送钥匙',
+		usagelog:'使用记录',
+		cancelled:'已取消',
+		inuse:'使用中',
+		copylink:'复制链接',
+		cancelride:'取消用车',
+		starttime:'Start Time',
+		endtime:'End Time'
 	},
 	'en-US': {
 		language: 'English',
@@ -106,7 +114,16 @@ export const langs = {
 		pleasepassword: 'Please enter Password',
 		pleasename: 'Please enter Name',
 		pleasemobile: 'Please enter Phone',
-		transferadmin:'Transfer Admin'
+		transferadmin:'Transfer Admin',
+		sendkey:'Send Key',
+		usagelog:'Usage Log',
+		cancelled:'Cancelled',
+		inuse:'In Use',
+		copylink:'Copy Link',
+		cancelride:'Cancel Ride',
+		starttime:'Start Time',
+		endtime:'End Time'
+		
 
 
 

@@ -1,15 +1,15 @@
 <template>
 	<view class="container" :style="{ height: `${safeScreenHeight}px` }">
-		<CustomNavBar title="发送电子钥匙" />
+		<CustomNavBar :title="langs.sendkey" />
 		<!-- 主容器 -->
 		<view class="record-container" :style="'margin-top: ' + (navbarTotalHeight) + 'px;'">
 			<!-- 标签切换区域 -->
 			<view class="record-tabs">
 				<view class="record-tabs-item" :class="(g_activeTab==1? 'tabs-active-1' : 'tabs-no-active-1')"
-					@tap="handleSwitchTab(1)">发送钥匙</view>
+					@tap="handleSwitchTab(1)">{{langs.sendkey}}</view>
 				<view class="record-tabs-item" :class="(g_activeTab==2? 'tabs-active-2' : 'tabs-no-active-2')"
 					@tap="handleSwitchTab(2)">
-					使用记录
+					{{langs.usagelog}}
 				</view>
 			</view>
 
@@ -33,31 +33,31 @@
 
 							<view class="content-item-info">
 								<view :class="'info-item  ' + (item?.vin?.length > 15 ? 'long-info-item' : '')">
-									<label>车架号 ：</label>
+									<label>{{langs.vin}} ：</label>
 									<text>{{ item?.vin || '-' }}</text>
 								</view>
 								<view :class="'info-item  ' + (item?.xsgw?.length > 15 ? 'long-info-item' : '')">
-									<label>油箱容积 ：</label>
+									<label>{{langs.fuel}} ：</label>
 									<text>{{ item?.xsgw ? item.xsgw + 'L' : '-' }}</text>
 								</view>
 								<view class="info-item">
-									<label>车辆类型 ：</label>
-									<text>{{ item?.sn ? '自助取还' : '非自助取还' }}</text>
+									<label>{{langs.cartype}} ：</label>
+									<text>{{ item?.sn ? langs.selfserve : langs.fullservice }}</text>
 								</view>
 								<view
 									:class="'info-item  ' + (item?.carOwnerName?.length > 15 ? 'long-info-item' : '')">
-									<label>设备平台 ：</label>
+									<label>{{langs.platform}} ：</label>
 									<text>{{ item?.carOwnerName || '-' }}</text>
 								</view>
 								<view :class="'info-item  ' + (item?.sn?.length > 15 ? 'long-info-item' : '')">
-									<label>设备号 ：</label>
+									<label>{{langs.devID}} ：</label>
 									<text>{{ item?.sn || '-' }}</text>
 								</view>
 							</view>
 							<view class="content-item-footer">
 								<view class="footer-right">
 									<view class="footer-right-btn" :data-item="item" @tap="handleSelectVehicle">
-										<text>发送钥匙</text>
+										<text>{{langs.sendkey}}</text>
 									</view>
 								</view>
 							</view>
@@ -84,8 +84,8 @@
 								</view>
 								<view class="head-right">
 									<text style="color: #333;opacity: 0.4;font-size: 26rpx;"
-										v-if="item.status">已取消</text>
-									<text style="color: #333;opacity: 1;font-size: 26rpx;" v-else>使用中</text>
+										v-if="item.status">{{langs.cancelled}}</text>
+									<text style="color: #333;opacity: 1;font-size: 26rpx;" v-else>{{langs.inuse}}</text>
 								</view>
 							</view>
 
@@ -111,13 +111,13 @@
 							<view class="content-item-footer" v-if="!item.status">
 								<view class="footer-right" style="display: flex;gap: 20rpx;">
 									<view class="footer-right-btn" :data-item="item" @tap="handleModify">
-										<text>修改</text>
+										<text>{{langs.update}}</text>
 									</view>
 									<view class="footer-right-btn" :data-item="item" @tap="handleCopy">
-										<text>复制链接</text>
+										<text>{{langs.copylink}}</text>
 									</view>
 									<view class="footer-right-btn" :data-item="item" @tap="handleCance">
-										<text>取消用车</text>
+										<text>{{langs.cancelride}}</text>
 									</view>
 								</view>
 							</view>
@@ -131,34 +131,34 @@
 			<form @submit="handleFormSubmit">
 				<view class="modal-container">
 					<view class="modal-container-head">
-						<text>{{whether?'修改':'发送钥匙'}}</text>
+						<text>{{whether?langs.update:langs.sendkey}}</text>
 						<image src="/static/public/close.png" @tap="handleHideSengKeyModal" />
 					</view>
 					<view class="modal-container-middle">
 						<view class="middle-form-item">
-							<label>车牌号</label>
+							<label>{{langs.plate}}</label>
 							<view class="modal-form-region">
 								{{g_uesr_details?.platenumber}}
 							</view>
 						</view>
 						<view class="middle-form-item">
-							<label>使用人</label>
+							<label>{{langs.user}}</label>
 							<view class="modal-form-region">
-								<input placeholder="请输入使用人" :value="g_uesr_details.personName" name="personName"
+								<input :placeholder="langs.pleasename" :value="g_uesr_details.personName" name="personName"
 									style="text-align: right; font-size: 28rpx" />
 							</view>
 						</view>
 						<view class="middle-form-item">
-							<label>手机号</label>
+							<label>{{langs.mobile}}</label>
 							<view class="modal-form-region">
 
 								<text v-if="whether">{{g_uesr_details.mobile}}</text>
-								<input v-else placeholder="请输入手机号" :value="g_uesr_details.mobile" name="mobile"
+								<input v-else :placeholder="langs.pleasemobile" :value="g_uesr_details.mobile" name="mobile"
 									style="text-align: right; font-size: 28rpx" />
 							</view>
 						</view>
 						<view class="middle-form-item">
-							<label>开始时间</label>
+							<label>{{langs.starttime}}</label>
 							<view class="modal-form-region">
 
 								<picker mode="date" data-index="startDate" @change="bindTimeChange">
@@ -175,7 +175,7 @@
 
 						</view>
 						<view class="middle-form-item">
-							<label>结束时间</label>
+							<label>{{langs.endtime}}</label>
 							<view class="modal-form-region">
 								<picker mode="date" data-index="endDate" @change="bindTimeChange">
 									<view class="form-item-text">
@@ -191,7 +191,7 @@
 						</view>
 					</view>
 					<view class="modal-container-footer">
-						<button formType="submit">确认</button>
+						<button formType="submit">{{langs.confirm}}</button>
 					</view>
 				</view>
 			</form>
@@ -214,6 +214,9 @@
 		info_screen
 	} from '@/utils/scheme/screen.js'
 	import 'url-search-params-polyfill'; // 兼容URLSearchParams的polyfill
+	import {
+		langs,
+	} from '@/utils/i18n/index.js'
 
 	export default {
 		components: {
@@ -234,7 +237,8 @@
 				endDate: '', // 钥匙使用结束日期
 				endTime: '', // 钥匙使用结束时间
 				whether: false, // 标识当前操作是修改(true)还是新增(false)
-				loading: false // 加载状态标识（用于防止重复加载）
+				loading: false, // 加载状态标识（用于防止重复加载）
+						langs: {}
 			};
 		},
 		onLoad(options) {
@@ -246,6 +250,7 @@
 			this.initialScreenInfo(); // 获取屏幕信息
 			this.initRentRecord(); // 初始化租赁记录
 			this.handleCurrentDate(); // 设置当前日期时间
+			this.handleGetCurrentLanguage()
 		},
 		computed: {
 			// 状态栏高度
@@ -266,6 +271,10 @@
 			}
 		},
 		methods: {
+			handleGetCurrentLanguage() {
+				let currentLang = uni.getStorageSync('lang') || 'zh-CN';
+				this.langs = langs[currentLang]
+			},
 			// 关闭发送钥匙弹窗
 			handleHideSengKeyModal() {
 				this.c_send_key_show_momal = false;
