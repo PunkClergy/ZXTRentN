@@ -1,6 +1,6 @@
 <template>
 	<view class="container" :style="{ height: `${safeScreenHeight}px` }">
-		<CustomNavBar title="移交管理员" />
+		<CustomNavBar :title="langs.transferadmin" />
 		<!-- 主容器 -->
 		<view class="record-container" :style="'margin-top: ' + (navbarTotalHeight) + 'px;'">
 			<scroll-view style="height: 100vh" scroll-y>
@@ -16,22 +16,22 @@
 
 						<view class="content-item-info">
 							<view :class="'info-item  ' + (item?.username?.length > 15 ? 'long-info-item' : '')">
-								<label>账号 ：</label>
+								<label>{{langs.account}} ：</label>
 								<text>{{ item?.username || '-' }}</text>
 							</view>
 							<view :class="'info-item  ' + (item?.roleName?.length > 15 ? 'long-info-item' : '')">
-								<label>角色 ：</label>
+								<label>{{langs.role}} ：</label>
 								<text>{{ item?.roleName}}</text>
 							</view>
 							<view :class="'info-item  ' + (item?.mobile?.length > 15 ? 'long-info-item' : '')">
-								<label>手机号 ：</label>
+								<label>{{langs.mobile}} ：</label>
 								<text>{{ item?.mobile || '-' }}</text>
 							</view>
 						</view>
 						<view class="content-item-footer">
 							<view class="footer-right">
 								<view class="footer-right-btn" :data-item="item" @tap="handleTransfer">
-									<text>移交管理员</text>
+									<text>{{langs.transferadmin}}</text>
 								</view>
 							</view>
 						</view>
@@ -51,7 +51,9 @@
 	import {
 		info_screen
 	} from '@/utils/scheme/screen.js'
-
+	import {
+		langs,
+	} from '@/utils/i18n/index.js'
 	export default {
 		components: {
 			CustomNavBar
@@ -60,6 +62,7 @@
 			return {
 				screenInfo: {}, // 屏幕信息对象
 				g_items: [], // 车辆列表数据
+				langs: {}
 			};
 		},
 		onLoad(options) {
@@ -69,6 +72,7 @@
 			// 页面显示时初始化
 			this.initialPersonnelList()
 			this.initialScreenInfo()
+			this.handleGetCurrentLanguage()
 		},
 		computed: {
 			// 状态栏高度
@@ -89,7 +93,10 @@
 			}
 		},
 		methods: {
-
+			handleGetCurrentLanguage() {
+				let currentLang = uni.getStorageSync('lang') || 'zh-CN';
+				this.langs = langs[currentLang]
+			},
 			// 获取屏幕信息
 			async initialScreenInfo() {
 				try {
@@ -151,7 +158,6 @@
 	};
 </script>
 <style>
-
 	.required-mark {
 		color: #f56c6c;
 		margin-left: 8rpx;

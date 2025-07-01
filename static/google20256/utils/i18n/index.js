@@ -52,6 +52,7 @@ export const langs = {
 		pleasename: '请输入姓名',
 		pleasepassword: '请输入密码',
 		pleasemobile: '请输入手机号',
+		transferadmin:'移交管理员'
 	},
 	'en-US': {
 		language: 'English',
@@ -104,7 +105,8 @@ export const langs = {
 		pleaseaccount: 'Please enter Account',
 		pleasepassword: 'Please enter Password',
 		pleasename: 'Please enter Name',
-		pleasemobile: 'Please enter Phone'
+		pleasemobile: 'Please enter Phone',
+		transferadmin:'Transfer Admin'
 
 
 
