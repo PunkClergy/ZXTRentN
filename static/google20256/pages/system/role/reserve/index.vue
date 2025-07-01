@@ -6,10 +6,10 @@
 			<!-- 标签切换区域 -->
 			<view class="record-tabs">
 				<view class="record-tabs-item" :class="(g_activeTab==1? 'tabs-active-1' : 'tabs-no-active-1')"
-					@tap="handleSwitchTab(1)">人员列表</view>
+					@tap="handleSwitchTab(1)">{{langs.userdirectory}}</view>
 				<view class="record-tabs-item" :class="(g_activeTab==2? 'tabs-active-2' : 'tabs-no-active-2')"
 					@tap="handleSwitchTab(2)">
-					权限管理
+					{{langs.accesscontrol}}
 				</view>
 			</view>
 
@@ -33,15 +33,15 @@
 
 							<view class="content-item-info">
 								<view :class="'info-item  ' + (item?.username?.length > 15 ? 'long-info-item' : '')">
-									<label>账号:</label>
+									<label>{{langs.account}} : </label>
 									<text>{{ item?.username || '-' }}</text>
 								</view>
 								<view :class="'info-item  ' + (item?.roleName?.length > 15 ? 'long-info-item' : '')">
-									<label>角色:</label>
+									<label>{{langs.role}} : </label>
 									<text>{{ item?.roleName || '-' }}</text>
 								</view>
 								<view :class="'info-item  ' + (item?.mobile?.length > 15 ? 'long-info-item' : '')">
-									<label>手机号:</label>
+									<label>{{langs.mobile}} : </label>
 									<text>{{ item?.mobile || '-' }}</text>
 								</view>
 							</view>
@@ -55,7 +55,7 @@
 				<scroll-view scroll-y style="height: 100vh">
 					<view class="card-info">
 						<view class="card-head">
-							<text>权限设置</text>
+							<text>{{langs.permissionssettings}}</text>
 						</view>
 						<ly-tree ref="tree" :props="props" :tree-data="treeData" node-key="id" show-checkbox
 							expand-on-check-node default-expand-all :check-strictly="false" :defaultCheckedKeys=[1]
@@ -70,7 +70,7 @@
 		</view>
 		<!-- 一键操作按钮 -->
 		<view class="levitation-button" @tap="handleJumpInfo">
-			<text>新增人员</text>
+			<text>{{langs.adduser}}</text>
 		</view>
 
 		<view class="modal-mask" v-if="c_send_key_show_momal" @tap="handleHideSengKeyModal"></view>
@@ -78,41 +78,41 @@
 			<form @submit="handleFormSubmit">
 				<view class="modal-container">
 					<view class="modal-container-head">
-						<text>{{ user_text }}人员</text>
+						<text>{{ user_text||langs.create }}{{langs.user}}</text>
 						<image src="/static/public/close.png" @tap="handleHideSengKeyModal" />
 					</view>
 					<view class="modal-container-middle">
 						<view class="middle-form-item">
-							<label>账号</label>
+							<label>{{langs.account}}:</label>
 							<view class="modal-form-region">
-								<input placeholder="请输入账号" :value="g_uesr_details.username" name="username"
+								<input :placeholder="langs.pleaseaccount" :value="g_uesr_details.username" name="username"
 									style="text-align: right; font-size: 28rpx" />
 							</view>
 						</view>
 						<view class="middle-form-item">
-							<label>密码</label>
+							<label>{{langs.password}}:</label>
 							<view class="modal-form-region">
-								<input placeholder="请输入密码" :value="g_uesr_details.password" name="password"
+								<input :placeholder="langs.pleasepassword" :value="g_uesr_details.password" name="password"
 									style="text-align: right; font-size: 28rpx" />
 							</view>
 						</view>
 						<view class="middle-form-item">
-							<label>姓名</label>
+							<label>{{langs.name}}:</label>
 							<view class="modal-form-region">
-								<input placeholder="请输入姓名" :value="g_uesr_details.realname" name="realname"
+								<input :placeholder="langs.pleasename" :value="g_uesr_details.realname" name="realname"
 									style="text-align: right; font-size: 28rpx" />
 							</view>
 						</view>
 						<view class="middle-form-item">
-							<label>手机号</label>
+							<label>{{langs.mobile}}:</label>
 							<view class="modal-form-region">
-								<input placeholder="请输入手机号" :value="g_uesr_details.mobile" name="mobile"
+								<input :placeholder="langs.pleasemobile" :value="g_uesr_details.mobile" name="mobile"
 									style="text-align: right; font-size: 28rpx" />
 							</view>
 						</view>
 					</view>
 					<view class="modal-container-footer">
-						<button formType="submit">确认</button>
+						<button formType="submit">{{langs.confirm}}</button>
 					</view>
 				</view>
 			</form>
@@ -134,6 +134,9 @@
 	import {
 		info_screen
 	} from '@/utils/scheme/screen.js'
+	import {
+		langs,
+	} from '@/utils/i18n/index.js'
 
 	export default {
 		components: {
@@ -142,7 +145,7 @@
 		},
 		data() {
 			return {
-				title: '角色与人员',
+				title: '',
 				screenInfo: {}, // 屏幕信息对象
 				g_page: 1, // 当前页码
 				g_items: [], // 角色列表数据
@@ -158,13 +161,14 @@
 				},
 				treeData: [],
 				c_send_key_show_momal: false,
-				user_text: '新增',
+				user_text: '',
 				g_uesr_details: {
 					username: '',
 					password: '',
 					realname: '',
 					mobile: ''
 				},
+				langs: {}
 			};
 		},
 		onLoad(options) {
@@ -175,6 +179,7 @@
 		onShow() {
 			// 页面显示时初始化
 			this.initialScreenInfo()
+			this.handleGetCurrentLanguage()
 		},
 		computed: {
 			// 状态栏高度
@@ -195,12 +200,19 @@
 			}
 		},
 		methods: {
+			handleGetCurrentLanguage() {
+				let currentLang = uni.getStorageSync('lang') || 'zh-CN';
+				this.langs = langs[currentLang]
+			},
 			// 获取当前角色信息
 			initGetTitle(evt) {
 				if (evt?.name) {
 					this.title = evt?.name
 					this.initialRoleList(evt?.name)
 				}
+			},
+			handleCheckChange(evt){
+				console.log(evt)
 			},
 			async initGetMenuTree(evt) {
 				try {
@@ -218,7 +230,7 @@
 				// 此处是修改人员
 				this.g_uesr_details = evt
 				this.c_send_key_show_momal = true
-				this.user_text = "修改"
+				this.user_text = this.langs.update
 			},
 
 			// 切换标签页
@@ -281,7 +293,7 @@
 			handleHideSengKeyModal() {
 				this.c_send_key_show_momal = false
 				this.g_uesr_details = {}
-				this.user_text = "新增"
+				this.user_text = this.langs.create
 			},
 			// 删除人员
 			async handleDelete(evt) {
