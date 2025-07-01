@@ -9,10 +9,17 @@
 
 			<!-- 用户登录状态 -->
 			<view v-if="userInfo" class="login-info">
-				{{ userCompanyName }}(已登录)
+				<view class="login-info-text">
+					<text>{{ userCompanyName }}</text>
+					<text>({{ lang.signedin }})</text>
+				</view>
+				<view @tap="handleSwitchLanguage" class="login-btn-lang">{{lang.language}}</view>
 			</view>
-			<view v-else class="login-btn" @tap.stop="handleNavigateToLogin">
-				去登录
+			<view v-else class="login-btn">
+				<view class="login-info-text login-btn-color" @tap.stop="handleNavigateToLogin">
+					<text>{{ lang.signin }}</text>
+				</view>
+				<view @tap="handleSwitchLanguage" class="login-btn-lang">{{lang.language}}</view>
 			</view>
 		</view>
 
@@ -100,6 +107,12 @@
 		u_operation
 	} from '@/api'
 	import 'url-search-params-polyfill';
+	import {
+		langs,
+		setLang,
+		getLang,
+		getCurrentLangCode
+	} from '@/utils/i18n/index.js'
 	const DEFAULT_MENU_ICON = '/static/public/default-icon.png';
 	const MENU_ITEMS_PER_PAGE = 5; // 每页菜单项数量
 
@@ -123,6 +136,8 @@
 				activeIndex: 0, // 当前激活的分类索引
 				categoryPositions: [], // 存储分类位置信息
 				scrollTimer: null, // 滚动防抖计时器
+				lang: getLang(), // 默认语言库
+				currentLang: getCurrentLangCode() //当前语言
 			}
 		},
 		computed: {
@@ -190,6 +205,41 @@
 
 		},
 		methods: {
+			// 切换语言
+			handleSwitchLanguage() {
+				try {
+					const pages = getCurrentPages();
+					if (!pages.length) return;
+
+					const currentPage = pages[pages.length - 1];
+					const currentPath = '/' + currentPage.route;
+					const query = Object.entries(currentPage.options || {})
+						.map(([k, v]) => `${k}=${encodeURIComponent(JSON.stringify(v))}`)
+						.join('&');
+
+					// 切换语言
+					setLang(getCurrentLangCode() === 'en-US' ? 'zh-CN' : 'en-US');
+
+					// 重载页面
+					setTimeout(() => {
+						uni.redirectTo({
+							url: currentPath + (query ? `?${query}` : ''),
+							fail: (err) => {
+								console.error('页面重载失败', err);
+								uni.reLaunch({
+									url: currentPath
+								});
+							}
+						});
+					}, 100);
+				} catch (e) {
+					console.error('语言切换错误', e);
+					uni.showToast({
+						title: '语言切换失败',
+						icon: 'none'
+					});
+				}
+			},
 			// 项HTML发送数据前先请求拿到数据
 			async initSearchLink() {
 				let scene = '640019899'
@@ -459,13 +509,13 @@
 
 			// 子菜单项点击
 			handleChildItemTap(item) {
-				 if (!item.isdevelop) {
-				      uni.showToast({
-				        title: '暂未开通，敬请期待',
-				        icon: 'none'
-				      });
-				      return;
-				    }
+				if (!item.isdevelop) {
+					uni.showToast({
+						title: '暂未开通，敬请期待',
+						icon: 'none'
+					});
+					return;
+				}
 				if (item.name == '退出登录') {
 					uni.showModal({
 						title: '提示',
@@ -662,6 +712,7 @@
 				this.isLoading = false;
 			}
 			this.initSearchLink()
+
 		},
 
 		onReady() {
@@ -732,11 +783,31 @@
 		font-size: 28rpx;
 		padding: 8rpx 16rpx;
 		border-radius: 8rpx;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
 	}
 
-	.login-btn {
-		background-color: aliceblue;
+	.login-info-text {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		margin-right: 20rpx;
+	}
+
+	.login-btn-color {
+		background-color: #73A9C6;
 		color: white;
+		padding: 4rpx 10rpx;
+		border-radius: 5rpx;
+	}
+
+	.login-btn-lang {
+		border: 1px solid #B0B0B0;
+		color: white;
+		padding: 2rpx 10rpx;
+		border-radius: 5rpx;
 	}
 
 	.quick-container {
