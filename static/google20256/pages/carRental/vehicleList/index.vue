@@ -1,15 +1,15 @@
 <template>
 	<view class="container" :style="{ height: `${safeScreenHeight}px` }">
-		<CustomNavBar title="车辆绑定" />
+		<CustomNavBar :title="langs.vehiclebinding" />
 		<!-- 主容器 -->
 		<view class="record-container" :style="'margin-top: ' + (navbarTotalHeight) + 'px;'">
 			<!-- 标签切换区域 -->
 			<view class="record-tabs">
 				<view class="record-tabs-item" :class="(g_activeTab==1? 'tabs-active-1' : 'tabs-no-active-1')"
-					@tap="handleSwitchTab(1)">车辆列表</view>
+					@tap="handleSwitchTab(1)">{{langs.vehiclelist}}</view>
 				<view class="record-tabs-item" :class="(g_activeTab==2? 'tabs-active-2' : 'tabs-no-active-2')"
 					@tap="handleSwitchTab(2)">
-					{{ btnState }}车辆
+					{{ btnState||langs.create }}{{langs.vehicle}}
 				</view>
 			</view>
 
@@ -28,7 +28,7 @@
 									<view class="left-model">
 										{{ item?.vehicleSerialName || '-' }}{{ item?.vehicleModeName || '' }}
 									</view>
-									<view class="left-brand">短租</view>
+									<view class="left-brand">{{langs.dailyrental}}</view>
 								</view>
 								<view class="head-right">
 									<image src="/static/public/_edit.png" @tap="handleEdit(item)" />
@@ -37,24 +37,24 @@
 
 							<view class="content-item-info">
 								<view :class="'info-item  ' + (item?.vin?.length > 15 ? 'long-info-item' : '')">
-									<label>车架号 ：</label>
+									<label>{{langs.vin}} ：</label>
 									<text>{{ item?.vin || '-' }}</text>
 								</view>
 								<view :class="'info-item  ' + (item?.xsgw?.length > 15 ? 'long-info-item' : '')">
-									<label>油箱容积 ：</label>
+									<label>{{langs.fuel}} ：</label>
 									<text>{{ item?.xsgw ? item.xsgw + 'L' : '-' }}</text>
 								</view>
 								<view class="info-item">
-									<label>车辆类型 ：</label>
-									<text>{{ item?.sn ? '自助取还' : '非自助取还' }}</text>
+									<label>{{langs.cartype}} ：</label>
+									<text>{{ item?.sn ? langs.selfserve : langs.fullservice }}</text>
 								</view>
 								<view
 									:class="'info-item  ' + (item?.carOwnerName?.length > 15 ? 'long-info-item' : '')">
-									<label>设备平台 ：</label>
+									<label>{{langs.platform}} ：</label>
 									<text>{{ item?.carOwnerName || '-' }}</text>
 								</view>
 								<view :class="'info-item  ' + (item?.sn?.length > 15 ? 'long-info-item' : '')">
-									<label>设备号 ：</label>
+									<label>{{langs.devID}} ：</label>
 									<text>{{ item?.sn || '-' }}</text>
 								</view>
 							</view>
@@ -62,7 +62,7 @@
 								<view class="footer-right">
 									<view class="footer-right-btn" :data-item="item" v-if="souce"
 										@tap="handleSelectVehicle">
-										<text>选择此车</text>
+										<text>{{langs.selectcar}}</text>
 									</view>
 									<view>
 										<checkbox-group :data-item="item">
@@ -83,68 +83,72 @@
 						<!-- 车牌号 -->
 						<view class="card-info-item">
 							<label class="form-label">
-								车牌号<text class="required-mark">*</text>
+								{{langs.plate}}<text class="required-mark">*</text>
 							</label>
-							<input class="form-input" placeholder="请输入车牌号" :value="params?.platenumber" maxlength="10"
-								placeholder-style="color: #999;" @input="(e)=>handleBindinput(e,'platenumber')" />
+							<input class="form-input" :placeholder="langs.licenseplatenumber"
+								:value="params?.platenumber" maxlength="10" placeholder-style="color: #999;"
+								@input="(e)=>handleBindinput(e,'platenumber')" />
 						</view>
 						<!-- 设备号 -->
 						<view class="card-info-item">
 							<label class="form-label">
-								设备号<text class="required-mark">*</text>
+								{{langs.devID}}<text class="required-mark">*</text>
 							</label>
-							<input class="form-input" placeholder="请输入设备号" :value="params?.sn" maxlength="20"
-								placeholder-style="color: #999;" @input="(e)=>handleBindinput(e,'sn')" />
+							<input class="form-input" :placeholder="langs.deviceidentificationnumber"
+								:value="params?.sn" maxlength="20" placeholder-style="color: #999;"
+								@input="(e)=>handleBindinput(e,'sn')" />
 						</view>
 						<!-- 车系 -->
 						<view class="card-info-item">
-							<label>车系</label>
-							<input class="form-input" placeholder="请输入车系" :value="params?.vehicleSerialName"
-								placeholder-style="color: #999;" @input="(e)=>handleBindinput(e,'vehicleSerialName')" />
+							<label>{{langs.series}}</label>
+							<input class="form-input" :placeholder="langs.vehicleseries"
+								:value="params?.vehicleSerialName" placeholder-style="color: #999;"
+								@input="(e)=>handleBindinput(e,'vehicleSerialName')" />
 						</view>
 						<!-- 车型 -->
 						<view class="card-info-item">
-							<label>车型</label>
-							<input class="form-input" placeholder="请输入车型" :value="params?.vehicleModeName"
+							<label>{{langs.model}}</label>
+							<input class="form-input" :placeholder="langs.vehiclemodel" :value="params?.vehicleModeName"
 								placeholder-style="color: #999;" @input="(e)=>handleBindinput(e,'vehicleModeName')" />
 						</view>
 						<!-- 年款 -->
 						<view class="card-info-item">
-							<label>年款</label>
-							<input class="form-input" placeholder="请输入年款" :value="params?.ccdate"
+							<label>{{langs.year}}</label>
+							<input class="form-input" :placeholder="langs.modelyear" :value="params?.ccdate"
 								placeholder-style="color: #999;" @input="(e)=>handleBindinput(e,'ccdate')" />
 						</view>
 
 						<!-- 车架号 -->
 						<view class="card-info-item">
-							<label>车架号</label>
-							<input class="form-input" placeholder="请输入车架号" :value="params?.vin"
-								placeholder-style="color: #999;" @input="(e)=>handleBindinput(e,'vin')" />
+							<label>{{langs.vin}}</label>
+							<input class="form-input" :placeholder="langs.vehicleidentificationnumber"
+								:value="params?.vin" placeholder-style="color: #999;"
+								@input="(e)=>handleBindinput(e,'vin')" />
 						</view>
 						<!-- 油箱容积 -->
 						<view class="card-info-item">
-							<label>油箱容积</label>
-							<input class="form-input" placeholder="请输入油箱容积" :value="params?.xsgw"
+							<label>{{langs.fuel}}</label>
+							<input class="form-input" :placeholder="langs.fueltankcapacity" :value="params?.xsgw"
 								placeholder-style="color: #999;" @input="(e)=>handleBindinput(e,'xsgw')" />
 						</view>
 						<!-- 启动方式 -->
 						<view class="card-info-item">
-							<label>启动方式</label>
+							<label>{{langs.start}}</label>
 
 							<view class="card-info-item-tabs">
 								<view class="card-info-item-tabs-btn">
-									<text :class="batterylift == '一键启动' ? 'tabs-active' : ''"
-										@tap="handleBatterylift('一键启动')">一键启动</text>
-									<text :class="batterylift == '机械钥匙' ? 'tabs-active' : ''"
-										@tap="handleBatterylift('机械钥匙')">机械钥匙</text>
-									<text :class="batterylift == '其他' ? 'tabs-active' : ''"
-										@tap="handleBatterylift('其他')">其他</text>
+									<text :class="batterylift == langs.pushstart ? 'tabs-active' : ''"
+										@tap="handleBatterylift(langs.pushstart)">{{langs.pushstart}}</text>
+									<text :class="batterylift == langs.phykey ? 'tabs-active' : ''"
+										@tap="handleBatterylift(langs.phykey)">{{langs.phykey}}</text>
+									<text :class="batterylift == langs.other ? 'tabs-active' : ''"
+										@tap="handleBatterylift(langs.other)">{{langs.other}}</text>
 								</view>
 								<view class="tabs-footer">
-									<view>说明：</view>
+									<view>{{langs.explain}}：</view>
 									<view class="card-info-item-tips">
-										<view>[一键启动]为使用按键按下启动；</view>
-										<view>[机械钥匙]为使用钥匙片拧动启动；</view>
+										<view>[{{langs.pushstart}}]{{langs.explain1}}；</view>
+										<view>[{{langs.phykey}}]{{langs.explain2}}；</view>
 									</view>
 								</view>
 							</view>
@@ -152,7 +156,7 @@
 						</view>
 					</view>
 					<view class="card-footer">
-						<view @tap="handleSubmit">确认{{ btnState }}</view>
+						<view @tap="handleSubmit">{{langs.confirm}}{{ btnState||langs.create }}</view>
 					</view>
 				</scroll-view>
 
@@ -171,7 +175,9 @@
 		info_screen
 	} from '@/utils/scheme/screen.js'
 	import 'url-search-params-polyfill';
-
+	import {
+		langs,
+	} from '@/utils/i18n/index.js'
 	export default {
 		components: {
 			CustomNavBar
@@ -182,10 +188,11 @@
 				g_page: 1, // 当前页码
 				g_items: [], // 车辆列表数据
 				g_activeTab: 1, // 当前激活的标签页(1:车辆列表 2:新增车辆)
-				btnState: '新增', // 按钮显示文本
+				btnState: '', // 按钮显示文本
 				params: {},
-				batterylift: '一键启动',
-				souce: null
+				batterylift: '',
+				souce: null,
+				langs: {}
 			};
 		},
 		onLoad(options) {
@@ -196,6 +203,7 @@
 			// 页面显示时初始化
 			this.initialCarList()
 			this.initialScreenInfo()
+			this.handleGetCurrentLanguage()
 		},
 		computed: {
 			// 状态栏高度
@@ -216,6 +224,10 @@
 			}
 		},
 		methods: {
+			handleGetCurrentLanguage() {
+				let currentLang = uni.getStorageSync('lang') || 'zh-CN';
+				this.langs = langs[currentLang]
+			},
 			handleSelectVehicle(evt) {
 				console.log(evt?.currentTarget?.dataset)
 				uni.redirectTo({
@@ -237,7 +249,7 @@
 
 			// 编辑车辆信息
 			handleEdit(evt) {
-				this.btnState = '修改'
+				this.btnState = this.langs.update
 				this.params = evt
 				this.g_activeTab = 2
 			},
@@ -247,7 +259,7 @@
 				this.g_activeTab = evt
 				if (evt == 1) {
 					this.params = {}
-					this.btnState = '新增'
+					this.btnState = this.langs.create
 				}
 			},
 
@@ -270,7 +282,6 @@
 					const res = await u_getCarList({
 						page: this.g_page
 					});
-console.log(111111,res)
 					// 已加载全部数据的提示
 					if (this.g_page > 1 && res.content.length === 0) {
 						uni.showToast({

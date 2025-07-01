@@ -108,7 +108,6 @@
 	} from '@/api'
 	import 'url-search-params-polyfill';
 	import {
-		langs,
 		setLang,
 		getLang,
 		getCurrentLangCode
@@ -805,7 +804,7 @@
 
 	.login-btn-lang {
 		border: 1px solid #B0B0B0;
-		color: white;
+		color: #333;
 		padding: 2rpx 10rpx;
 		border-radius: 5rpx;
 	}
