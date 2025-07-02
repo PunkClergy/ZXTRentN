@@ -144,8 +144,8 @@
 						<view class="middle-form-item">
 							<label>{{langs.user}}</label>
 							<view class="modal-form-region">
-								<input :placeholder="langs.pleasename" :value="g_uesr_details.personName" name="personName"
-									style="text-align: right; font-size: 28rpx" />
+								<input :placeholder="langs.pleasename" :value="g_uesr_details.personName"
+									name="personName" style="text-align: right; font-size: 28rpx" />
 							</view>
 						</view>
 						<view class="middle-form-item">
@@ -153,8 +153,8 @@
 							<view class="modal-form-region">
 
 								<text v-if="whether">{{g_uesr_details.mobile}}</text>
-								<input v-else :placeholder="langs.pleasemobile" :value="g_uesr_details.mobile" name="mobile"
-									style="text-align: right; font-size: 28rpx" />
+								<input v-else :placeholder="langs.pleasemobile" :value="g_uesr_details.mobile"
+									name="mobile" style="text-align: right; font-size: 28rpx" />
 							</view>
 						</view>
 						<view class="middle-form-item">
@@ -238,7 +238,7 @@
 				endTime: '', // 钥匙使用结束时间
 				whether: false, // 标识当前操作是修改(true)还是新增(false)
 				loading: false, // 加载状态标识（用于防止重复加载）
-						langs: {}
+				langs: {}
 			};
 		},
 		onLoad(options) {

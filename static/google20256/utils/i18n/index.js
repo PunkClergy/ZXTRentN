@@ -1,7 +1,7 @@
 // langs.js - 多语言模块优化版
 export const langs = {
 	'zh-CN': {
-		language: '中文',
+		language: 'English',
 		signedin: '已登录',
 		signin: '去登录',
 		vehiclelist: '车辆列表',
@@ -60,10 +60,12 @@ export const langs = {
 		copylink:'复制链接',
 		cancelride:'取消用车',
 		starttime:'Start Time',
-		endtime:'End Time'
+		endtime:'End Time',
+		vehicleselection:'选择车辆',
+		reselect:'重新选择'
 	},
 	'en-US': {
-		language: 'English',
+		language: '中文',
 		signedin: 'Signed in',
 		signin: 'Sign in',
 		vehiclelist: 'Vehicle List',
@@ -122,7 +124,10 @@ export const langs = {
 		copylink:'Copy Link',
 		cancelride:'Cancel Ride',
 		starttime:'Start Time',
-		endtime:'End Time'
+		endtime:'End Time',
+		vehicleselection:'Vehicle Selection',
+		reselect:'Reselect'
+		
 		
 
 

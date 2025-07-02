@@ -251,7 +251,8 @@
 					setTimeout(() => {
 						this.sendDataToWebview({
 							type: 'desk',
-							payload: info
+							payload: info,
+							lang:this.currentLang
 						});
 					}, 2000);
 				} catch (error) {

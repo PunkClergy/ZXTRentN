@@ -3,7 +3,7 @@
 		<CustomNavBar title="车务使用电子钥匙" />
 		<view class="select-region">
 			<view class="select-vehicle" @tap="handleJumpVehicle" v-if="!vehicle_info?.sn">
-				<text>选择车辆</text>
+				<text>{{langs.vehicleselection}}</text>
 				<image src="/static/public/right.png" class="select-vehicle-image"></image>
 			</view>
 			<view v-else>
@@ -20,20 +20,20 @@
 								{{vehicle_info.vehicleSerialName||'-'}}{{vehicle_info.vehicleModeName||''}}</text>
 						</view>
 						<view>
-							{{vehicle_info.sn ?'自助取还':vehicle_info.sn===null?'非自助取还':'-'}}
+							{{vehicle_info.sn ?langs.selfserve:vehicle_info.sn===null?langs.fullservice:'-'}}
 						</view>
 					</view>
 					<view style="display: flex;flex-direction: row;align-items: center;" @tap="handleJumpVehicle">
-						<text style="font-size: 28rpx;color: #2440b3;">重新选择</text>
+						<text style="font-size: 28rpx;color: #2440b3;">{{langs.reselect}}</text>
 						<image src="/static/public/right.png" style="width: 28rpx;height: 28rpx;"></image>
 					</view>
 				</view>
 				<view
 					style="display: flex;width: 730rpx;flex-direction: row;justify-content: space-between;padding: 20rpx;">
 					<view>
-						车架号：{{vehicle_info?.vin||'-'}}
+						{{langs.vin}}：{{vehicle_info?.vin||'-'}}
 					</view>
-					<view>油箱容积：{{vehicle_info?.xsgw||0}}</view>
+					<view>{{langs.fuel}}：{{vehicle_info?.xsgw||0}}</view>
 				</view>
 			</view>
 		</view>
@@ -56,6 +56,9 @@
 	} from '@/api'
 	import 'url-search-params-polyfill';
 	import CustomNavBar from "@/components/custom-header/index.nvue";
+	import {
+		langs
+	} from '@/utils/i18n/index.js'
 
 	// 常量定义
 	const DATA_SEND_INTERVAL = 2000;
@@ -76,7 +79,8 @@
 			vehicle_info: {},
 			info: [],
 			isLoading: false,
-			sendDataTimeout: null
+			sendDataTimeout: null,
+			langs: {},
 		}),
 
 		computed: {
@@ -130,6 +134,7 @@
 			} finally {
 				this.isLoading = false;
 			}
+			this.handleGetCurrentLanguage()
 		},
 
 		onUnload() {
@@ -137,6 +142,10 @@
 		},
 
 		methods: {
+			handleGetCurrentLanguage() {
+				let currentLang = uni.getStorageSync('lang') || 'zh-CN';
+				this.langs = langs[currentLang]
+			},
 			// 初始化屏幕信息
 			async initialScreenInfo() {
 				try {
@@ -166,12 +175,14 @@
 
 			// 防抖发送数据
 			sendDataToWebviewDebounced() {
+				let currentLang = uni.getStorageSync('lang') || 'zh-CN';
 				this.clearSendDataTimer();
 				this.sendDataTimeout = setTimeout(() => {
 					this.sendDataToWebview({
 						type: 'elctrncky',
 						payload: this.info,
-						vehicle_info: this.vehicle_info
+						vehicle_info: this.vehicle_info,
+						lang: currentLang
 					});
 				}, DATA_SEND_INTERVAL);
 			},
@@ -210,12 +221,10 @@
 
 			// 消息处理
 			handlePostMessage(evt) {
-				console.log(2323232344, evt)
 				const messageData = evt?.detail?.data?.[0] || {};
 				const {
 					source
 				} = messageData;
-				console.log('2222ddd2', source)
 				if (!source) {
 					console.warn('Received message without type:', evt);
 					return;
