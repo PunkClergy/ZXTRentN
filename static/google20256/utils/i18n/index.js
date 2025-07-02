@@ -71,7 +71,6 @@ export const langs = {
 		tax_id: '纳税人识别号',
 		address: '地址',
 		bank: '开户行',
-		account: '开户账号',
 		company_placeholder: "请输入企业名称",
 		contact_placeholder: "请输入联系人",
 		phone_placeholder: "请输入联系电话",
@@ -82,7 +81,14 @@ export const langs = {
 		bank_placeholder: "请输入开户行",
 		account_placeholder: "请输入开户账号",
 		phone_number: '请输入电话',
-		businesshours: '营业时间'
+		businesshours: '营业时间',
+		signup: "注册",
+		haveanaccount: "已有账号?",
+		loginnow: "立即登录",
+		entercode: "请输入验证码",
+		Reenterpassword: "请再次输入密码",
+		verificationcode: '验证码',
+		confirmpassword: '确认密码',
 	},
 	'en-US': {
 		language: '中文',
@@ -123,7 +129,6 @@ export const langs = {
 		fueltankcapacity: 'Fuel Tank Capacity',
 		userdirectory: 'User Directory',
 		accesscontrol: 'Access Control',
-		account: 'Account',
 		role: 'Role',
 		mobile: 'Mobile',
 		permissionssettings: 'Permissions Settings',
@@ -166,7 +171,14 @@ export const langs = {
 		bank_placeholder: "Enter bank name",
 		account_placeholder: "Enter account number",
 		phone_number: 'Enter phone number',
-		businesshours: 'Business Hours'
+		businesshours: 'Business Hours',
+		Reenterpassword: "Re-enter Password",
+		verificationcode: 'verification Code',
+		signup: "Sign Up",
+		haveanaccount: "Have an account?",
+		loginnow: "Log In Now",
+		entercode: "Enter Code",
+		confirmpassword: 'Confirm Password',
 	}
 };
 

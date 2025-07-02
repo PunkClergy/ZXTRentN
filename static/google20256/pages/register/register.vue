@@ -15,31 +15,31 @@
 			<!-- 注册表单 -->
 			<view class="input-group">
 				<view class="input-item">
-					<view class="input-label">手机号</view>
-					<input class="input-field" placeholder="请输入手机号" v-model="phone" type="number" />
+					<view class="input-label">{{langs.mobile}}</view>
+					<input class="input-field" :placeholder="langs.pleasemobile" v-model="phone" type="number" />
 				</view>
 				<view class="input-item">
-					<view class="input-label">密码</view>
-					<input class="input-field" placeholder="6-20位字母数字组合" v-model="password" :password="true" />
+					<view class="input-label">{{langs.password}}</view>
+					<input class="input-field" :placeholder="langs.pleasepassword" v-model="password" :password="true" />
 				</view>
 				<view class="input-item">
-					<view class="input-label">确认密码</view>
-					<input class="input-field" placeholder="请再次输入密码" v-model="confirmPassword" :password="true" />
+					<view class="input-label">{{langs.confirmpassword}}</view>
+					<input class="input-field" :placeholder="langs.Reenterpassword" v-model="confirmPassword" :password="true" />
 				</view>
 
 				<view class="input-item">
-					<view class="input-label">验证码</view>
-					<input class="input-field" placeholder="请输入验证码" v-model="smsCode" />
+					<view class="input-label">{{langs.verificationcode}}</view>
+					<input class="input-field" :placeholder="langs.verificationcode" v-model="smsCode" />
 					<button class="sms-btn" :disabled="smsDisabled" @tap="getSmsCode">
-						{{ smsBtnText }}
+						{{ smsBtnText||langs.verificationcode }}
 					</button>
 				</view>
 				
-				<button class="register-btn" :disabled="isSubmitting" @tap="handleRegister">注册</button>
+				<button class="register-btn" :disabled="isSubmitting" @tap="handleRegister">{{langs.signup}}</button>
 				
 				<view class="login-link">
-					<text>已有账号？</text>
-					<text class="link-text" @tap="goToLogin">立即登录</text>
+					<text>{{langs.haveanaccount}}</text>
+					<text class="link-text" @tap="goToLogin">{{langs.loginnow}}</text>
 				</view>
 			</view>
 		</view>
@@ -49,7 +49,9 @@
 <script>
 	import { u_register, u_getSmsCode } from '@/api';
 	import CustomNavBar from "@/components/custom-header/index.vue";
-	
+	import {
+		langs
+	} from '@/utils/i18n/index.js'
 	export default {
 		data() {
 			return {
@@ -60,14 +62,22 @@
 				smsCode: '',
 				isSubmitting: false,
 				smsDisabled: false,
-				smsBtnText: '获取验证码',
-				countdown: 60
+				smsBtnText: '',
+				countdown: 60,
+				langs: {},
 			};
 		},
 		components: {
 			CustomNavBar
 		},
+		onShow() {
+			this.handleGetCurrentLanguage()
+		},
 		methods: {
+			handleGetCurrentLanguage() {
+				let currentLang = uni.getStorageSync('lang') || 'zh-CN';
+				this.langs = langs[currentLang]
+			},
 			// 获取短信验证码
 			async getSmsCode() {
 				if (!this.phone) {

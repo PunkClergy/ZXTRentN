@@ -20,16 +20,16 @@
 
 			<view class="input-group">
 				<view class="input-item">
-					<view class="input-label">账号</view>
-					<input class="input-field" placeholder="请输入账号或手机号" v-model="username" />
+					<view class="input-label">{{langs.account}}</view>
+					<input class="input-field" :placeholder="langs.pleaseaccount" v-model="username" />
 				</view>
 				<view class="input-item">
-					<view class="input-label">密码</view>
-					<input class="input-field" placeholder="请输入密码" v-model="password" :password="true" />
+					<view class="input-label">{{langs.password}}</view>
+					<input class="input-field" :placeholder="langs.pleasepassword" v-model="password" :password="true" />
 				</view>
 				<view>
-					<button class="login-btn" @tap="handleLogin">登录</button>
-					<text class="register" @tap="handleRegister">注册账号</text>
+					<button class="login-btn" @tap="handleLogin">{{langs.loginnow}}</button>
+					<text class="register" @tap="handleRegister">{{langs.signup}}</text>
 				</view>
 			</view>
 
@@ -59,13 +59,17 @@
 		u_getQrcodeImg
 	} from '@/api';
 	import CustomNavBar from "@/components/custom-header/index.vue";
+	import {
+		langs
+	} from '@/utils/i18n/index.js'
 	export default {
 		data() {
 			return {
 				username: '',
 				password: '',
 				isSubmitting: false,
-				init_qr_code: ''
+				init_qr_code: '',
+				langs: {},
 			};
 		},
 		components: {
@@ -74,7 +78,14 @@
 		mounted() {
 			this.infinityGetQrcodeImg()
 		},
+		onShow() {
+			this.handleGetCurrentLanguage()
+		},
 		methods: {
+			handleGetCurrentLanguage() {
+				let currentLang = uni.getStorageSync('lang') || 'zh-CN';
+				this.langs = langs[currentLang]
+			},
 			// 预览图片
 			handlePreviewImage(evt) {
 				uni.previewMedia({
