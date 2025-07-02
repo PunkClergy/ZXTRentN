@@ -13,77 +13,75 @@
 
 					<view class="card-info-item">
 						<label class="form-label">
-							企业名称
+							{{langs.company}}
 						</label>
-						<input class="form-input" placeholder="请输入企业名称" :value="params?.name" maxlength="10"
-							placeholder-style="color: #999;" @input="(e)=>handleBindinput(e,'name')" />
+						<input class="form-input" :placeholder="langs.company_placeholder" :value="params?.name"
+							maxlength="10" placeholder-style="color: #999;" @input="(e)=>handleBindinput(e,'name')" />
 					</view>
 					<!-- 联系人 -->
 					<view class="card-info-item">
 						<label class="form-label">
-							联系人
+							{{langs.contact}}
 						</label>
-						<input class="form-input" placeholder="请输入联系人" :value="params?.chargename" maxlength="20"
-							placeholder-style="color: #999;" @input="(e)=>handleBindinput(e,'chargename')" />
+						<input class="form-input" :placeholder="langs.contact_placeholder" :value="params?.chargename"
+							maxlength="20" placeholder-style="color: #999;"
+							@input="(e)=>handleBindinput(e,'chargename')" />
 					</view>
 					<!-- 联系电话 -->
 					<view class="card-info-item">
-						<label>联系电话</label>
-						<input class="form-input" placeholder="请输入联系电话" :value="params?.chargemobile"
+						<label>{{langs.phone}}</label>
+						<input class="form-input" :placeholder="langs.phone_placeholder" :value="params?.chargemobile"
 							placeholder-style="color: #999;" @input="(e)=>handleBindinput(e,'chargemobile')" />
 					</view>
 					<!-- 备注 -->
 					<view class="card-info-item">
-						<label>备注</label>
-						<input class="form-input" placeholder="请输入备注" :value="params?.bak"
+						<label>{{langs.notes}}</label>
+						<input class="form-input" :placeholder="langs.notes_placeholder" :value="params?.bak"
 							placeholder-style="color: #999;" @input="(e)=>handleBindinput(e,'bak')" />
 					</view>
 					<!-- 开票名称 -->
 					<view class="card-info-item">
-						<label>开票名称</label>
-						<input class="form-input" placeholder="请输入开票名称" :value="params?.invoiceHeader"
-							placeholder-style="color: #999;" @input="(e)=>handleBindinput(e,'invoiceHeader')" />
+						<label>{{langs.invoice_name}}</label>
+						<input class="form-input" :placeholder="langs.invoice_name_placeholder"
+							:value="params?.invoiceHeader" placeholder-style="color: #999;"
+							@input="(e)=>handleBindinput(e,'invoiceHeader')" />
 					</view>
 
 					<!-- 纳税人识别号 -->
 					<view class="card-info-item">
-						<label>纳税人识别号</label>
-						<input class="form-input" placeholder="请输入识别号" :value="params?.invoiceNum"
+						<label>{{langs.tax_id}}</label>
+						<input class="form-input" :placeholder="langs.tax_id_placeholder" :value="params?.invoiceNum"
 							placeholder-style="color: #999;" @input="(e)=>handleBindinput(e,'invoiceNum')" />
 					</view>
 					<!-- 电话 -->
 					<view class="card-info-item">
-						<label>电话</label>
-						<input class="form-input" placeholder="请输入油箱电话" :value="params?.invoiceMobile"
-							placeholder-style="color: #999;" @input="(e)=>handleBindinput(e,'invoiceMobile')" />
-					</view>
-					<!-- 电话 -->
-					<view class="card-info-item">
-						<label>电话</label>
-						<input class="form-input" placeholder="请输入油箱电话" :value="params?.invoiceMobile"
+						<label>{{langs.mobile}}</label>
+						<input class="form-input" :placeholder="langs.phone_number" :value="params?.invoiceMobile"
 							placeholder-style="color: #999;" @input="(e)=>handleBindinput(e,'invoiceMobile')" />
 					</view>
 					<!-- 地址 -->
 					<view class="card-info-item">
-						<label>地址</label>
-						<input class="form-input" placeholder="请输入地址" :value="params?.invoiceAddress"
-							placeholder-style="color: #999;" @input="(e)=>handleBindinput(e,'invoiceAddress')" />
+						<label>{{langs.address}}</label>
+						<input class="form-input" :placeholder="langs.address_placeholder"
+							:value="params?.invoiceAddress" placeholder-style="color: #999;"
+							@input="(e)=>handleBindinput(e,'invoiceAddress')" />
 					</view>
 					<!-- 开户行 -->
 					<view class="card-info-item">
-						<label>开户行</label>
-						<input class="form-input" placeholder="请输入开户行" :value="params?.accountsBank"
+						<label>{{langs.bank}}</label>
+						<input class="form-input" :placeholder="langs.bank_placeholder" :value="params?.accountsBank"
 							placeholder-style="color: #999;" @input="(e)=>handleBindinput(e,'accountsBank')" />
 					</view>
 					<!-- 开户账号 -->
 					<view class="card-info-item">
-						<label>开户账号</label>
-						<input class="form-input" placeholder="请输入开户账号" :value="params?.bankCardNumber"
-							placeholder-style="color: #999;" @input="(e)=>handleBindinput(e,'bankCardNumber')" />
+						<label>{{langs.account}}</label>
+						<input class="form-input" :placeholder="langs.account_placeholder"
+							:value="params?.bankCardNumber" placeholder-style="color: #999;"
+							@input="(e)=>handleBindinput(e,'bankCardNumber')" />
 					</view>
 				</view>
 				<view class="card-footer">
-					<view @tap="handleSubmit">确认提交</view>
+					<view @tap="handleSubmit">{{langs.confirm}}</view>
 				</view>
 			</scroll-view>
 		</view>
@@ -100,6 +98,9 @@
 		info_screen
 	} from '@/utils/scheme/screen.js'
 	import 'url-search-params-polyfill';
+	import {
+		langs
+	} from '@/utils/i18n/index.js'
 
 	export default {
 		components: {
@@ -108,7 +109,8 @@
 		data() {
 			return {
 				screenInfo: {}, // 屏幕信息对象
-				params: {}
+				params: {},
+				langs: {},
 			};
 		},
 		onLoad(options) {
@@ -118,6 +120,7 @@
 		onShow() {
 			this.initialScreenInfo()
 			this.initGetInfo()
+			this.handleGetCurrentLanguage()
 		},
 		computed: {
 			// 状态栏高度
@@ -138,7 +141,10 @@
 			}
 		},
 		methods: {
-
+			handleGetCurrentLanguage() {
+				let currentLang = uni.getStorageSync('lang') || 'zh-CN';
+				this.langs = langs[currentLang]
+			},
 			// 获取屏幕信息
 			async initialScreenInfo() {
 				try {

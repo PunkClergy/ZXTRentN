@@ -17,19 +17,19 @@
 
 						<view class="content-item-info">
 							<view :class="'info-item  ' + (item?.linkperson?.length > 15 ? 'long-info-item' : '')">
-								<label>联系人 ：</label>
+								<label>{{langs.contact}} ：</label>
 								<text>{{ item?.linkperson || '-' }}</text>
 							</view>
 							<view :class="'info-item  ' + (item?.linkmobile?.length > 15 ? 'long-info-item' : '')">
-								<label>联系电话 ：</label>
+								<label>{{langs.phone}} ：</label>
 								<text>{{ item?.linkmobile || '-' }}</text>
 							</view>
 							<view class="info-item  long-info-item">
-								<label>营业时间 ：</label>
+								<label>{{langs.businesshours}} ：</label>
 								<text>{{ item?.workinghours||'-' }}</text>
 							</view>
 							<view class="info-item  long-info-item">
-								<label>地址 ：</label>
+								<label>{{langs.address}} ：</label>
 								<text>{{item.province||''}}{{item.city||''}}{{item.area||''}}{{item.address||''}}</text>
 							</view>
 						</view>
@@ -49,7 +49,9 @@
 		info_screen
 	} from '@/utils/scheme/screen.js'
 	import 'url-search-params-polyfill';
-
+	import {
+		langs
+	} from '@/utils/i18n/index.js'
 	export default {
 		components: {
 			CustomNavBar
@@ -60,7 +62,8 @@
 				g_page: 1, // 当前页码
 				g_items: [], // 车辆列表数据
 				params: {},
-				souce: null
+				souce: null,
+				langs: {},
 			};
 		},
 		onLoad(options) {
@@ -71,6 +74,7 @@
 			// 页面显示时初始化
 			this.initialCarList()
 			this.initialScreenInfo()
+			this.handleGetCurrentLanguage()
 		},
 		computed: {
 			// 状态栏高度
@@ -91,6 +95,10 @@
 			}
 		},
 		methods: {
+			handleGetCurrentLanguage() {
+				let currentLang = uni.getStorageSync('lang') || 'zh-CN';
+				this.langs = langs[currentLang]
+			},
 			// 滚动到底部加载更多
 			lower(e) {
 				if (!this.loading) {
