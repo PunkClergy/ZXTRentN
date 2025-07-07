@@ -15,8 +15,8 @@
 			<!-- 注册表单 -->
 			<view class="input-group">
 				<view class="input-item">
-					<view class="input-label">{{langs.mobile}}</view>
-					<input class="input-field" :placeholder="langs.pleasemobile" v-model="phone" type="number" />
+					<view class="input-label">{{langs.username}}</view>
+					<input class="input-field" :placeholder="langs.pleaseusername" v-model="username"  />
 				</view>
 				<view class="input-item">
 					<view class="input-label">{{langs.password}}</view>
@@ -27,13 +27,6 @@
 					<input class="input-field" :placeholder="langs.Reenterpassword" v-model="confirmPassword" :password="true" />
 				</view>
 
-				<view class="input-item">
-					<view class="input-label">{{langs.verificationcode}}</view>
-					<input class="input-field" :placeholder="langs.verificationcode" v-model="smsCode" />
-					<button class="sms-btn" :disabled="smsDisabled" @tap="getSmsCode">
-						{{ smsBtnText||langs.verificationcode }}
-					</button>
-				</view>
 				
 				<button class="register-btn" :disabled="isSubmitting" @tap="handleRegister">{{langs.signup}}</button>
 				
@@ -47,7 +40,7 @@
 </template>
 
 <script>
-	import { u_register, u_getSmsCode } from '@/api';
+	import { u_register } from '@/api';
 	import CustomNavBar from "@/components/custom-header/index.vue";
 	import {
 		langs
@@ -78,71 +71,23 @@
 				let currentLang = uni.getStorageSync('lang') || 'zh-CN';
 				this.langs = langs[currentLang]
 			},
-			// 获取短信验证码
-			async getSmsCode() {
-				if (!this.phone) {
-					uni.showToast({ title: '请输入手机号', icon: 'none' });
-					return;
-				}
-				if (!/^1[3-9]\d{9}$/.test(this.phone)) {
-					uni.showToast({ title: '手机号格式错误', icon: 'none' });
-					return;
-				}
-				
-				try {
-					// 调用获取验证码API
-					await u_getSmsCode({ mobile: this.phone });
-					uni.showToast({ title: '验证码已发送', icon: 'none' });
-					
-					// 开始倒计时
-					this.smsDisabled = true;
-					this.startCountdown();
-				} catch (error) {
-					uni.showToast({ title: '验证码发送失败', icon: 'none' });
-				}
-			},
 			
-			// 倒计时
-			startCountdown() {
-				let timer = setInterval(() => {
-					this.countdown--;
-					this.smsBtnText = `${this.countdown}秒后重发`;
-					
-					if (this.countdown <= 0) {
-						clearInterval(timer);
-						this.smsBtnText = '获取验证码';
-						this.smsDisabled = false;
-						this.countdown = 60;
-					}
-				}, 1000);
-			},
-			
+		
 			// 表单验证
 			validateForm() {
 				if (!this.password) {
 					uni.showToast({ title: '请输入密码', icon: 'none' });
 					return false;
 				}
-				if (this.password.length < 6 || this.password.length > 20) {
-					uni.showToast({ title: '密码长度需在6-20位之间', icon: 'none' });
-					return false;
-				}
 				if (this.password !== this.confirmPassword) {
 					uni.showToast({ title: '两次输入的密码不一致', icon: 'none' });
 					return false;
 				}
-				if (!this.phone) {
-					uni.showToast({ title: '请输入手机号', icon: 'none' });
+				if (!this.username) {
+					uni.showToast({ title: '用户名', icon: 'none' });
 					return false;
 				}
-				if (!/^1[3-9]\d{9}$/.test(this.phone)) {
-					uni.showToast({ title: '手机号格式错误', icon: 'none' });
-					return false;
-				}
-				if (!this.smsCode) {
-					uni.showToast({ title: '请输入验证码', icon: 'none' });
-					return false;
-				}
+
 				return true;
 			},
 			
@@ -150,14 +95,12 @@
 			async handleRegister() {
 				if (this.isSubmitting) return;
 				if (!this.validateForm()) return;
-				
 				this.isSubmitting = true;
 				
 				try {
 					const response = await u_register({
 						password: this.password,
-						mobile: this.phone,
-						yzcode: this.smsCode
+						username: this.username,
 					});
 					console.log(response)
 					if (response.code === 1000) {

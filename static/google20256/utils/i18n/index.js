@@ -89,6 +89,8 @@ export const langs = {
 		Reenterpassword: "请再次输入密码",
 		verificationcode: '验证码',
 		confirmpassword: '确认密码',
+		username: '用户名',
+		pleaseusername: '请输入用户名'
 	},
 	'en-US': {
 		language: '中文',
@@ -179,6 +181,8 @@ export const langs = {
 		loginnow: "Log In Now",
 		entercode: "Enter Code",
 		confirmpassword: 'Confirm Password',
+		username: 'Username',
+		pleaseusername: 'Please enter username'
 	}
 };
 
