@@ -466,7 +466,9 @@
 						icon: item.icon ?
 							`${this.baseLink}/img/${item.icon}` : DEFAULT_MENU_ICON
 					}));
+					console.log(menuItems)
 					this.currentQuick = menuItems[0]?.id || '';
+					this.handleMenuItemTap(menuItems[0])
 				} catch (error) {
 					console.error('[Menu] 获取失败:', error);
 					uni.showToast({

@@ -40,12 +40,12 @@ class Http {
 		}
 
 		// 显示加载中
-		if (mergedConfig.loading) {
-			uni.showLoading({
-				title: '加载中...',
-				mask: true
-			})
-		}
+		// if (mergedConfig.loading) {
+		// 	uni.showLoading({
+		// 		title: '加载中...',
+		// 		mask: true
+		// 	})
+		// }
 
 		try {
 			// 如果是 FormData 请求，构造 application/x-www-form-urlencoded 数据

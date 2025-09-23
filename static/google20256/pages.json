@@ -111,6 +111,13 @@
 			{
 				"navigationBarTitleText" : "修改用户名密码"
 			}
+		},
+		{
+			"path" : "pages/privateCar/VehicleControl/index",
+			"style" : 
+			{
+				"navigationBarTitleText" : ""
+			}
 		}
 	],
 	"globalStyle": {
