@@ -442,15 +442,14 @@
 				console.log(1111, options?.scene)
 				if (options?.scene) {
 					u_getCarBluetoothKeyByCode({
-						code: options.scene
+						code: options?.scene
 					}).then(response => {
-						console.log(1111110000, response)
-						if (!response?.data?.content) {
+						if (!response?.content) {
 							return;
 						}
 						this.netWork = true
 
-						handleData(response.data.content);
+						handleData(response?.content);
 					})
 				} else {
 					// 本地存储处理
@@ -461,11 +460,11 @@
 						},
 						fail(err) {
 							const param = {
-								[u_carList.page]: 1
+								page: 1
 							};
 							u_paivatecarList(param).then(response => {
-								uni.setStorageSync('bluetoothData', response?.data?.content?.[0]);
-								handleData(response?.data?.content?.[0]);
+								uni.setStorageSync('bluetoothData', response?.content?.[0]);
+								handleData(response?.content?.[0]);
 							})
 						}
 					});
