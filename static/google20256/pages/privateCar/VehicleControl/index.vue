@@ -425,7 +425,6 @@
 				const options = this.options;
 				// 统一处理函数
 				const handleData = (data) => {
-					console.log(22222222, data)
 					if (!data) {
 						return;
 					}
@@ -439,7 +438,6 @@
 
 
 				};
-				console.log(1111, options?.scene)
 				if (options?.scene) {
 					u_getCarBluetoothKeyByCode({
 						code: options?.scene
@@ -543,6 +541,9 @@
 			 * 处理蓝牙连接状态：检查设备是否已连接，决定执行连接或重连逻辑
 			 */
 			handleBule() {
+				// 设备未连接，执行连接逻辑;
+				this.btnStartConnect();
+				return
 				bleKeyManager.isDeviceConnected(this.deviceIDC, (status, param) => {
 					console.log(555555, status, param)
 					if (status) {
@@ -815,7 +816,8 @@
 				// 判断是否达到上传阈值
 				if (updatedLogs.length >= MAX_LOGS_BEFORE_UPLOAD) {
 					u_paivateuploadLog(updatedLogs).then(response => {
-						if (response?.data?.code === 1000) {
+						console.log(response)
+						if (response?.code === 1000) {
 							this.logs = []
 
 						} else {

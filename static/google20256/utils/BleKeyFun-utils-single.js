@@ -438,6 +438,7 @@ function onBluetoothDeviceFound() {
 			console.log(devices);
 			deviceId = devices.devices[0].deviceId;
 			saveBLEDeviceInfo(gIdc);
+			onBLEConnectionStateChange()
 			//监听连接状态
 			// onBLEConnectionStateChange(function (connectState) {
 			//   //设置连接状态
@@ -574,7 +575,9 @@ function getBLEDeviceReadCharacteristics() {
 				notifyBLECharacteristicValueChange();
 			}
 			if (gReadRandomCharacteristic != '') {
-				readBLECharacteristicValue();
+				setTimeout(() => {
+					readBLECharacteristicValue();
+				}, 100)
 			}
 			// if (gWriteService != '' && gReadService != '' && gWriteCharacteristic != '' && gReadCharacteristic != '' && gReadRandomCharacteristic != '') {
 			//   saveDeviceInfo();
@@ -629,7 +632,7 @@ function notifyBLECharacteristicValueChange() {
 				function() {
 					//判断版本是否支持
 					// if (systemType.toLowerCase() == 'android' && systemVersion > 8) {
-					
+
 					uni.setBLEMTU({
 						deviceId: deviceId,
 						mtu: 240,
@@ -669,7 +672,7 @@ function notifyBLECharacteristicValueChangeConnected() {
 					}
 				},
 				function() {
-					
+
 					uni.setBLEMTU({
 						deviceId: deviceId,
 						mtu: 240,
@@ -1148,16 +1151,16 @@ function clrBLEDeviceInfo(deviceIDC) {
 	});
 }
 export default {
-  connectBLE,
-  releaseBle,
-  dispatcherSend2,
-  DEFAULT_BLUETOOTH_STATE,
-  getBLEConnectionState,
-  getBLEConnectionID,
-  makePair,
-  saveBLEDeviceInfo,
-  getBLEDeviceInfo,
-  clrBLEDeviceInfo,
-  isDeviceConnected,
-  connectBLEConnected
+	connectBLE,
+	releaseBle,
+	dispatcherSend2,
+	DEFAULT_BLUETOOTH_STATE,
+	getBLEConnectionState,
+	getBLEConnectionID,
+	makePair,
+	saveBLEDeviceInfo,
+	getBLEDeviceInfo,
+	clrBLEDeviceInfo,
+	isDeviceConnected,
+	connectBLEConnected
 };
