@@ -488,7 +488,7 @@
 			handleSelectJump() {
 				if (this?.bluetoothData?.platenumber) {
 					uni.redirectTo({
-						url: `/pages/listOfPrivateCars/index?sn=${this.deviceIDC}&bluetoothKey=${this.orgKeyOld}`
+						url: `/pages/privateCar/SettingsDetail/index?sn=${this.deviceIDC}&bluetoothKey=${this.orgKeyOld}`
 					});
 				} else {
 					uni.showModal({
@@ -533,7 +533,7 @@
 			// 跳转安装手册
 			handleJumpSc() {
 				uni.redirectTo({
-					url: '/pages/listOfPrivateCars/pdf/index?flag=1'
+					url: '/pages/privateCar/pdf/index?flag=1'
 				});
 			},
 

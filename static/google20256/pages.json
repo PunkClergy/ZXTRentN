@@ -81,49 +81,56 @@
 		},
 		{
 			"path": "pages/improveData/contactUs/index",
-			 "style": {
-			 	"navigationBarTitleText": "税务和发票资料"
-			 }
+			"style": {
+				"navigationBarTitleText": "税务和发票资料"
+			}
 		},
 		{
 			"path": "pages/improveData/installer/index",
-			 "style": {
-			 	"navigationBarTitleText": "安装商查询"
-			 }
-		},
-		{
-			"path" : "pages/improveData/shops/index",
-			"style" : 
-			{
-				"navigationBarTitleText" : "商铺地址"
+			"style": {
+				"navigationBarTitleText": "安装商查询"
 			}
 		},
 		{
-			"path" : "pages/carRental/oilPrice/index",
-			"style" : 
-			{
-				"navigationBarTitleText" : "油价"
+			"path": "pages/improveData/shops/index",
+			"style": {
+				"navigationBarTitleText": "商铺地址"
 			}
 		},
 		{
-			"path" : "pages/resetPassword/index",
-			"style" : 
-			{
-				"navigationBarTitleText" : "修改用户名密码"
+			"path": "pages/carRental/oilPrice/index",
+			"style": {
+				"navigationBarTitleText": "油价"
 			}
 		},
 		{
-			"path" : "pages/privateCar/VehicleControl/index",
-			"style" : 
-			{
-				"navigationBarTitleText" : ""
+			"path": "pages/resetPassword/index",
+			"style": {
+				"navigationBarTitleText": "修改用户名密码"
 			}
 		},
 		{
-			"path" : "pages/privateCar/VehicleList/index",
-			"style" : 
-			{
-				"navigationBarTitleText" : ""
+			"path": "pages/privateCar/VehicleControl/index",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "pages/privateCar/VehicleList/index",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "pages/privateCar/SettingsDetail/index",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "pages/privateCar/pdf/index",
+			"style": {
+				"navigationBarTitleText": ""
 			}
 		}
 	],
@@ -135,14 +142,12 @@
 		"navigationStyle": "custom"
 	},
 	"uniIdRouter": {},
-	"condition" : { //模式配置，仅开发期间生效
+	"condition": { //模式配置，仅开发期间生效
 		"current": 0, //当前激活的模式(list 的索引项)
-		"list": [
-			{
-				"name": "", //模式名称
-				"path": "", //启动页面，必选
-				"query": "" //启动参数，在页面的onLoad函数里面得到
-			}
-		]
+		"list": [{
+			"name": "", //模式名称
+			"path": "", //启动页面，必选
+			"query": "" //启动参数，在页面的onLoad函数里面得到
+		}]
 	}
 }
