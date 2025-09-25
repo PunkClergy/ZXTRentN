@@ -433,7 +433,7 @@
 					that.orgKeyOld = data?.bluetoothKey
 					that.bluetoothData = data
 					setTimeout(() => {
-						that.handleBule();
+						that.btnStartConnect();
 					}, 100);
 
 
@@ -537,42 +537,6 @@
 				});
 			},
 
-			/**
-			 * 处理蓝牙连接状态：检查设备是否已连接，决定执行连接或重连逻辑
-			 */
-			handleBule() {
-				// 设备未连接，执行连接逻辑;
-				this.btnStartConnect();
-				return
-				bleKeyManager.isDeviceConnected(this.deviceIDC, (status, param) => {
-					console.log(555555, status, param)
-					if (status) {
-						//设备已连接，执行已连接逻辑
-						this.btnStartConnectConnected();
-					} else {
-						// 设备未连接，执行连接逻辑;
-						this.btnStartConnect();
-					}
-				});
-			},
-
-			// 设备已连接，执行已连接逻辑
-			btnStartConnectConnected() {
-				if (this.connectionID == '') {
-					bleKeyManager.connectBLEConnected(
-						this.deviceIDC,
-						(state) => {
-							this.bluetoothStateMonitor(state);
-						},
-						(type, arrayData, hexData, hexTextData) => {
-							this.bluetoothDataMonitor(type, arrayData, hexData, hexTextData);
-						}
-					);
-				} else {
-					uni.showModal('已连接蓝牙', false, (confirm) => {});
-				}
-			},
-
 			// 蓝牙状态执行对应操作
 			bluetoothStateMonitor: function(state) {
 				if (bleKeyManager.DEFAULT_BLUETOOTH_STATE.BLUETOOTH_PRE_EXECUTE == state) {
@@ -650,8 +614,7 @@
 						break;
 				}
 			},
-
-			/**
+/**
 			 * 数据打包与发送
 			 * @param {number} type 数据类型
 			 * @param {number} len 数据长度

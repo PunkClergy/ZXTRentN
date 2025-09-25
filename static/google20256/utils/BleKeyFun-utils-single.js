@@ -1,11 +1,10 @@
 //获取工具类
 import utils from './byte-util.js'
 //系统api
-// const appUtil = require('./app-util.js');
 import appUtil from './app-util.js';
 //日志
-// const logger = require('./logger.js');
 import logger from './logger.js';
+
 var gWriteService = '';
 const WRITE_SERVICE_SHORTHAND = '6E400001';
 var gReadService = '';
@@ -16,13 +15,13 @@ var gReadCharacteristic = '';
 const READ_CHARACTERISTIC_SHORTHAND = '6E400003';
 var gReadRandomCharacteristic = '';
 const READRANDOM_CHARACTERISTIC_SHORTHAND = '6E400004';
+
 var ReadServiceFixed = '6E400001-B5A3-F393-E0A9-E50E24DCCA9E';
 var WriteServiceFixed = '6E400001-B5A3-F393-E0A9-E50E24DCCA9E';
 var ReadCharacteristicFixed = '6E400003-B5A3-F393-E0A9-E50E24DCCA9E';
 var WriteCharacteristicFixed = '6E400002-B5A3-F393-E0A9-E50E24DCCA9E';
 var ReadRandomCharacteristicFixed = '6E400004-B5A3-F393-E0A9-E50E24DCCA9E';
-//上次执行的时间
-var lastExecuteTime = 0;
+
 //设备号
 var gIdc = '';
 //控制密码
@@ -41,30 +40,12 @@ var available = false;
 var discovering = false;
 //蓝牙适配器是否已经打开
 var isBLEAdapterOpen = false;
-//最后一次发送的控制指令
-
-//最后一次发送的指令
-var lastSendData = '';
 //连接状态
 var connected = false;
-//扫描超时时间
-
-//最后一次点击的名称
-var lastClickName;
 //系统，Android IOS
 var systemType = '';
 //系统版本
 var systemVersion = '';
-//重复发送
-var sendRepetTimeOut;
-//每条指令最大重复发送4次,共发送5次
-var sendMaxTime = 4;
-//重复发送间隔时间
-
-//最后一次接受到的数据
-var lastReceiverData;
-//搜索设备超时
-var discoverTimeout;
 
 /**
  * 蓝牙状态
@@ -125,10 +106,6 @@ function getBLEConnectionID() {
 }
 
 /**
- * 是否需要扫描
- */
-
-/**
  * 释放数据
  */
 function releaseData() {
@@ -163,26 +140,14 @@ function releaseBle() {
 }
 
 /**
- * 单位时间内禁止重复操作
- */
-
-/**
  * 判断是否支持ble
  */
 function isSupportedBLE(isSupported) {
 	const deviceInfo = uni.getDeviceInfo();
-	// console.log(deviceInfo);
 	var brand = deviceInfo.brand;
-	// console.log(brand);
 	var platform = deviceInfo.platform;
-	// console.log(platform);
 	var system = deviceInfo.system;
 	logger.e('手机型号:' + brand + ',系统信息:' + platform + ',系统版本:' + system);
-	//判断版本是否支持
-	// if (systemType.toLowerCase() == 'android' && systemVersion < 4.3) {
-	//   //不支持
-	//   isSupported(false);
-	// } else {
 	isSupported(true);
 }
 
@@ -296,7 +261,6 @@ function closeBluetoothAdapter() {
 function startConnect() {
 	uni.createBLEConnection({
 		deviceId: deviceId,
-		// timeout: 2000,
 		success: function(res) {
 			/**
 			 * 连接成功，后开始获取设备的服务列表
@@ -317,42 +281,21 @@ function startConnect() {
 
 function startConnectConnected() {
 	getBLEDeviceServicesConnected();
-	// wx.createBLEConnection({
-	//   deviceId: deviceId,
-	//   // timeout: 2000,
-	//   success: function (res) {
-	//     /**
-	//     * 连接成功，后开始获取设备的服务列表
-	//     */
-	//     getBLEDeviceServicesConnected();
-	//   },
-	//   fail: function (res) {
-	//     //连接失败
-	//     console.log(res);
-	//     gBluetoothState(DEFAULT_BLUETOOTH_STATE.BLUETOOTH_CONNECT_FAILED);
-	//   }
-	// })
 }
 
 /**
  * 监听低功耗蓝牙连接状态的改变事件，包括开发者主动连接或断开连接，设备丢失，连接异常断开等等
  */
-function onBLEConnectionStateChange(onStateChanged) {
+function onBLEConnectionStateChange() {
 	uni.onBLEConnectionStateChange(function(res) {
-		//console.log(`device ${res.deviceId} state has changed, connected: ${res.connected}`);
 		logger.e(`device ${res.deviceId} state has changed, connected: ${res.connected}`);
-		//onStateChanged(res.connected);
-		//设置连接状态
-		//connected = connectState;
 		connected = res.connected;
-		//console.log("gblestate:",gBluetoothState);
+		
 		if (gBluetoothState != undefined) {
 			if (connected) {
 				gBluetoothState(DEFAULT_BLUETOOTH_STATE.BLUETOOTH_CONNECT_SUCESS);
 			} else {
 				gBluetoothState(DEFAULT_BLUETOOTH_STATE.BLUETOOTH_ERROR);
-				//gBluetoothState(DEFAULT_BLUETOOTH_STATE.BLUETOOTH_CONNECT_FAILED);
-				//releaseBle();
 			}
 		}
 
@@ -361,9 +304,6 @@ function onBLEConnectionStateChange(onStateChanged) {
 				if (discovering) {
 					stopScanBle();
 				}
-			} else {
-				// if(!discovering)
-				//   startBluetoothDevicesDiscovery();
 			}
 		}
 	});
@@ -395,7 +335,6 @@ function disConnect() {
 function startBluetoothDevicesDiscovery() {
 	//开始搜索
 	uni.startBluetoothDevicesDiscovery({
-		//services: [ReadServiceFixed], //这里广播中不带有UUID信息,所以不能设置
 		success: function(res) {
 			console.log(res);
 			discovering = res.isDiscovering;
@@ -407,87 +346,30 @@ function startBluetoothDevicesDiscovery() {
 			gBluetoothState(DEFAULT_BLUETOOTH_STATE.BLUETOOTH_DEVICES_DISCOVERY_FAILD);
 		}
 	});
-	// discoverTimeout = setTimeout(function () {
-	//   if (discovering) {
-	//     gBluetoothState(DEFAULT_BLUETOOTH_STATE.BLUETOOTH_ERROR);
-	//     gBluetoothState(DEFAULT_BLUETOOTH_STATE.BLUETOOTH_NOT_FOUND);
-	//     stopScanBle();
-	//     if (isBLEAdapterOpen) {
-	//       logger.e('关闭适配器');
-	//       closeBluetoothAdapter();
-	//     }
-	//   }
-	// }, devicesDiscoveryTimeOut);
 }
 
 /**
  * 监听寻找到新设备的事件
  */
 function onBluetoothDeviceFound() {
-	//安卓手机6.0系统及以上 必须开启微信定位权限才能使用 蓝牙搜索功能
 	uni.onBluetoothDeviceFound(function(devices) {
 		if (devices.devices[0].name != '') {
 			logger.e('device found:' + devices.devices[0].name);
 		}
-		if (
-			//gIdc == devices.devices[0].name
-			//||
-			gIdc == devices.devices[0].localName
-			//|| utils.hexCharCodeToStr(utils.buf2hex(devices.devices[0].advertisData)).indexOf(gIdc) != -1
-		) {
+		if (gIdc == devices.devices[0].localName) {
 			console.log(devices);
 			deviceId = devices.devices[0].deviceId;
 			saveBLEDeviceInfo(gIdc);
 			onBLEConnectionStateChange()
-			//监听连接状态
-			// onBLEConnectionStateChange(function (connectState) {
-			//   //设置连接状态
-			//   connected = connectState;
-			//   if (connectState) {
-			//     gBluetoothState(DEFAULT_BLUETOOTH_STATE.BLUETOOTH_CONNECT_SUCESS);
-			//   } else {
-			//     gBluetoothState(DEFAULT_BLUETOOTH_STATE.BLUETOOTH_ERROR);
-			//     //gBluetoothState(DEFAULT_BLUETOOTH_STATE.BLUETOOTH_CONNECT_FAILED);
-			//     //releaseBle();
-			//   }
-			// });
-			/**
-			 * 监听蓝牙适配器状态
-			 */
 			onBluetoothAdapterStateChange();
-			/**
-			 * 获取设备发过来的数据
-			 */
 			onBLECharacteristicValueChange();
-			//停止扫描
-			//stopScanBle();
-			clearTimeout(discoverTimeout);
 			startConnect(gPwd, gSendType, gBluetoothState, gOnReceiveValue);
 		}
 	});
 }
 
 function onBluetoothDeviceFoundConnected() {
-	//安卓手机6.0系统及以上 必须开启微信定位权限才能使用 蓝牙搜索功能
-	//监听连接状态
-	// onBLEConnectionStateChange(function (connectState) {
-	//   //设置连接状态
-	//   connected = connectState;
-	//   if (connectState) {
-	//     gBluetoothState(DEFAULT_BLUETOOTH_STATE.BLUETOOTH_CONNECT_SUCESS);
-	//   } else {
-	//     gBluetoothState(DEFAULT_BLUETOOTH_STATE.BLUETOOTH_ERROR);
-	//     //gBluetoothState(DEFAULT_BLUETOOTH_STATE.BLUETOOTH_CONNECT_FAILED);
-	//     //releaseBle();
-	//   }
-	// })
-	/**
-	 * 监听蓝牙适配器状态
-	 */
 	onBluetoothAdapterStateChange();
-	/**
-	 * 获取设备发过来的数据
-	 */
 	onBLECharacteristicValueChangeConnected();
 	startConnectConnected(gPwd, gSendType, gBluetoothState, gOnReceiveValue);
 }
@@ -518,7 +400,6 @@ function stopScanBle() {
  * 获取设备的服务列表
  */
 function getBLEDeviceServices() {
-	// setTimeout(() => {
 	uni.getBLEDeviceServices({
 		deviceId: deviceId,
 		success: function(res) {
@@ -539,7 +420,6 @@ function getBLEDeviceServices() {
 			}
 		}
 	});
-	// }, 1000);
 }
 
 function getBLEDeviceServicesConnected() {
@@ -579,9 +459,6 @@ function getBLEDeviceReadCharacteristics() {
 					readBLECharacteristicValue();
 				}, 100)
 			}
-			// if (gWriteService != '' && gReadService != '' && gWriteCharacteristic != '' && gReadCharacteristic != '' && gReadRandomCharacteristic != '') {
-			//   saveDeviceInfo();
-			// }
 		},
 		fail: function(res) {
 			console.log(res);
@@ -616,9 +493,6 @@ function notifyBLECharacteristicValueChange() {
 		state: true,
 		success: function(res) {
 			console.log(res);
-			// if (gWriteCharacteristic == '') {
-			//   getBLEDeviceWriteCharacteristics();
-			// }
 			appUtil.getSystemInfoComplete(
 				function(res) {
 					var system = res.system;
@@ -630,9 +504,6 @@ function notifyBLECharacteristicValueChange() {
 					}
 				},
 				function() {
-					//判断版本是否支持
-					// if (systemType.toLowerCase() == 'android' && systemVersion > 8) {
-
 					uni.setBLEMTU({
 						deviceId: deviceId,
 						mtu: 240,
@@ -643,7 +514,6 @@ function notifyBLECharacteristicValueChange() {
 							console.log('MTU modify fail');
 						}
 					});
-					// }
 				}
 			);
 		},
@@ -672,7 +542,6 @@ function notifyBLECharacteristicValueChangeConnected() {
 					}
 				},
 				function() {
-
 					uni.setBLEMTU({
 						deviceId: deviceId,
 						mtu: 240,
@@ -733,10 +602,6 @@ function getBLEDeviceWriteCharacteristics() {
 			for (var j = 0; j < res.characteristics.length; j++) {
 				if (res.characteristics[j].uuid.indexOf(WIRTE_CHARACTERISTIC_SHORTHAND) != -1) {
 					gWriteCharacteristic = res.characteristics[j].uuid;
-					//写出数据
-					// if (equireTypeArray.indexOf(gSendType) != -1) {
-					//   sendMyData(gIdc, gPwd, gSendType, gBluetoothState, gOnReceiveValue, false);
-					// }
 				}
 			}
 
@@ -774,19 +639,15 @@ function onBLECharacteristicValueChange() {
 		var receiverHexData = utils.buf2hex(resultArrayBufferData);
 		var arrayData = utils.hexStringToArray(receiverHexData);
 		const formatted = getBLEDataTime();
-		//console.log(characteristic);
+		
 		if (characteristic.characteristicId.indexOf(READRANDOM_CHARACTERISTIC_SHORTHAND) != -1) {
-			//logger.e('random characteristic array value:', arrayData + "  hex value:" + receiverHexData);
 			console.log('随机指令接收:' + formatted + '  数据:' + receiverHexData);
 			logger.e('随机指令数据:' + receiverHexData, false, false, true);
 			gOnReceiveValue(0, arrayData, utils.hexCharCodeToStr(receiverHexData), receiverHexData);
-			//logger.e('text', utils.hexCharCodeToStr(receiverHexData));
 		} else {
-			//logger.e('notify characteristic array value:', arrayData + "  hex value:" + receiverHexData);
 			console.log('通知指令接收:' + formatted + '  数据:' + receiverHexData);
 			logger.e('通知指令接收:' + receiverHexData, false, false, true);
 			gOnReceiveValue(1, arrayData, utils.hexCharCodeToStr(receiverHexData), receiverHexData);
-			//logger.e('text', utils.hexCharCodeToStr(receiverHexData));
 		}
 	});
 }
@@ -797,19 +658,15 @@ function onBLECharacteristicValueChangeConnected() {
 		var receiverHexData = utils.buf2hex(resultArrayBufferData);
 		var arrayData = utils.hexStringToArray(receiverHexData);
 		const formatted = getBLEDataTime();
-		//console.log(characteristic);
+		
 		if (characteristic.characteristicId == ReadRandomCharacteristicFixed) {
-			//logger.e('random characteristic array value:', arrayData + "  hex value:" + receiverHexData);
 			console.log('随机指令接收:' + formatted + '  数据:' + receiverHexData);
 			logger.e('随机指令数据:' + receiverHexData, false, false, true);
 			gOnReceiveValue(0, arrayData, utils.hexCharCodeToStr(receiverHexData), receiverHexData);
-			//logger.e('text', utils.hexCharCodeToStr(receiverHexData));
 		} else {
-			//logger.e('notify characteristic array value:', arrayData + "  hex value:" + receiverHexData);
 			console.log('通知指令接收:' + formatted + '  数据:' + receiverHexData);
 			logger.e('通知指令接收:' + receiverHexData, false, false, true);
 			gOnReceiveValue(1, arrayData, utils.hexCharCodeToStr(receiverHexData), receiverHexData);
-			//logger.e('text', utils.hexCharCodeToStr(receiverHexData));
 		}
 	});
 }
@@ -819,13 +676,9 @@ function onBLECharacteristicValueChangeConnected() {
  */
 function writeBLECharacteristicValue(buffer, writeBLECharacteristicValue) {
 	uni.writeBLECharacteristicValue({
-		// 这里的 deviceId 需要在上面的 getBluetoothDevices 或 onBluetoothDeviceFound 接口中获取
 		deviceId: deviceId,
-		// 这里的 serviceId 需要在上面的 getBLEDeviceServices 接口中获取
 		serviceId: WriteServiceFixed,
-		// 这里的 characteristicId 需要在上面的 getBLEDeviceCharacteristics 接口中获取
 		characteristicId: WriteCharacteristicFixed,
-		// 这里的value是ArrayBuffer类型
 		value: buffer,
 		success: function(res) {
 			writeBLECharacteristicValue(true);
@@ -861,7 +714,6 @@ function initSendData(idc, pwd, sendType, bluetoothState, onReceiveValue) {
 		gIdc = idc;
 	}
 	onBluetoothDeviceFound();
-	sendMaxTime = 4;
 }
 
 function initSendDataConnected(idc, pwd, sendType, bluetoothState, onReceiveValue) {
@@ -881,7 +733,6 @@ function initSendDataConnected(idc, pwd, sendType, bluetoothState, onReceiveValu
 		gIdc = idc;
 	}
 	onBluetoothDeviceFoundConnected();
-	sendMaxTime = 4;
 }
 
 /*---------------------------------------------------------------*/
@@ -904,35 +755,16 @@ function connectBLEConnected(idc, bluetoothState, onReceiveValue) {
 }
 
 function connectMyBLE(idc, bluetoothState, onReceiveValue, isIntercept) {
-	// if (isIntercept && isQuickStart('sendMyData')) {
-	//   console.log('不可以频繁点击');
-	//   bluetoothState(DEFAULT_BLUETOOTH_STATE.BLUETOOTH_SEND_FREQUENTLY);
-	//   return;
-	// }
-	// if (isIntercept) {
-	//   //用户的主动行为
-	//   bluetoothState(DEFAULT_BLUETOOTH_STATE.BLUETOOTH_PRE_EXECUTE);
-	// }
-
 	if (connected) {
 		// 已连接，发送数据
-		// dispatcherSend(parseCmd(), false);
 	} else {
 		isSupportedBLE(function(isSupported) {
 			if (isSupported) {
 				isBLEAdapterAvailable(function(ava) {
 					if (ava) {
 						initSendData(idc, '', '', bluetoothState, onReceiveValue);
-						// if (needScan()) {
-						//适配器可用，并已经打开适配器
 						startBluetoothDevicesDiscovery();
-						// } else {
-
-						//   //开始连接
-						//   //startConnect();
-						// }
 					} else {
-						//适配器不可用
 						gBluetoothState(DEFAULT_BLUETOOTH_STATE.BLUETOOTH_ERROR);
 						gBluetoothState(DEFAULT_BLUETOOTH_STATE.BLUETOOTH_ADAPTER_UNAVAILABLE);
 					}
@@ -952,7 +784,6 @@ function connectMyBLEConnected(idc, bluetoothState, onReceiveValue, isIntercept)
 				if (ava) {
 					initSendDataConnected(idc, '', '', bluetoothState, onReceiveValue);
 				} else {
-					//适配器不可用
 					bluetoothState(DEFAULT_BLUETOOTH_STATE.BLUETOOTH_ERROR);
 					bluetoothState(DEFAULT_BLUETOOTH_STATE.BLUETOOTH_ADAPTER_UNAVAILABLE);
 				}
@@ -974,22 +805,8 @@ function connectMyBLEConnected(idc, bluetoothState, onReceiveValue, isIntercept)
  * noRepeat:6001指令不需要应答
  */
 function dispatcherSend2(sendData, noRepeat) {
-	lastSendData = sendData;
-	// var dataLength = sendData.length;
-	// var num = dataLength / 40;
 	var data = sendData;
 	delaySend2(data, noRepeat);
-	// if (num == 0) {
-	//   send(sendData.substring(num, dataLength));
-	// } else {
-	//   for (var i = 0; i < num; i++) {
-	//     var start = i * 40;
-	//     var end = start + 40;
-	//     end = end > dataLength ? dataLength : end;
-	//     var data = sendData.substring(start, end);
-	//     delaySend(data, noRepeat);
-	//   }
-	// }
 }
 
 /**
@@ -1007,29 +824,18 @@ function delaySend2(data, noRepeat) {
  * hex:十六进制字符串
  */
 function send2(hex, noRepeat) {
-	//发送数据
 	var buffer = hex;
-	//var buffer = typedArray.buffer
-	//logger.e("发送数据：" + buffer);
 	writeBLECharacteristicValue(buffer, function(isSuccess) {
 		const formatted = getBLEDataTime();
 		var sendArrayBufferData = buffer;
 		var sendHexData = utils.buf2hex(sendArrayBufferData);
-		// 输出如 "2025-09-03"
 
 		if (isSuccess) {
-			//logger.e("指令发送成功:" + (new Date().getTime()));
 			console.log('指令发送成功:' + formatted + '  数据:' + sendHexData);
 			logger.e('指令发送成功:' + sendHexData, false, false, true);
-			// if(noRepeat)
-			//   releaseBle();
-			// else
-			//   sendRepet(true, noRepeat);
 		} else {
-			//logger.e("指令发送失败:" + (new Date().getTime()));
 			console.log('!!!指令发送失败:' + formatted + '  数据:' + sendHexData);
 			logger.e('!!!指令发送失败:' + sendHexData, false, false, true);
-			// sendRepet(false, noRepeat);
 		}
 	});
 }
@@ -1040,53 +846,13 @@ function send2(hex, noRepeat) {
 
 function makePair() {
 	uni.makeBluetoothPair({
-		// 这里的 deviceId 需要在上面的 getBluetoothDevices 或 onBluetoothDeviceFound 接口中获取
 		deviceId: deviceId,
-		// 这里的 characteristicId 需要在上面的 getBLEDeviceCharacteristics 接口中获取
 		timeout: 20000,
 		success: function(res) {
 			console.log(res);
 		},
 		fail: function(res) {
 			console.log(res);
-		}
-	});
-}
-
-function isDeviceConnected(deviceIDC, param) {
-	isBLEAdapterAvailable(function(ava) {
-		if (ava) {
-			logger.e('查询已连接设备,适配器已开启');
-			getBLEDeviceInfo(deviceIDC, function(status) {
-				if (status) {
-					logger.e('查询已连接设备,已获取蓝牙设备信息');
-					console.log(status);
-					// const deviceInfo = wx.getDeviceInfo()
-					// console.log(deviceInfo);
-
-					onBLEConnectionStateChange();
-					//if(deviceInfo.system.toLowerCase().indexOf('android')!=-1){
-					uni.createBLEConnection({
-						deviceId: deviceId,
-						timeout: 3000,
-						success: function(result) {
-							logger.e('查询已连接设备,已成功建立连接');
-							param(true, result);
-						},
-						fail: function(result) {
-							logger.e('查询已连接设备,未成功建立连接!!!');
-							param(false, result);
-						}
-					});
-				} else {
-					logger.e('查询已连接设备,未获取蓝牙设备信息!!!');
-					console.log(status);
-					param(false, status);
-				}
-			});
-		} else {
-			logger.e('查询已连接设备,适配器未开启!!!');
-			param(false, res);
 		}
 	});
 }
@@ -1101,9 +867,7 @@ function saveBLEDeviceInfo(deviceIDC) {
 	param['writeCharacUUID'] = gWriteCharacteristic;
 	param['randomServiceUUID'] = gReadService;
 	param['randomCharacUUID'] = gReadRandomCharacteristic;
-	//console.log(param);
 	var jparam = JSON.stringify(param);
-	//console.log(jparam)
 	uni.setStorage({
 		key: deviceIDC,
 		data: jparam,
@@ -1116,9 +880,7 @@ function getBLEDeviceInfo(deviceIDC, result) {
 	uni.getStorage({
 		key: deviceIDC,
 		success: function(res) {
-			//console.log(res);
 			var param = JSON.parse(res.data);
-			//console.log(param)
 			deviceId = param.deviceId;
 			console.log(deviceId);
 			gReadService = param.readServiceUUID;
@@ -1132,13 +894,11 @@ function getBLEDeviceInfo(deviceIDC, result) {
 			gReadRandomCharacteristic = param.randomCharacUUID;
 			console.log(gReadRandomCharacteristic);
 			result(true, param);
-			//ready(true);
 		},
 
 		fail: function(res) {
 			console.log(res);
 			result(false);
-			//ready(false);
 		}
 	});
 }
@@ -1150,6 +910,7 @@ function clrBLEDeviceInfo(deviceIDC) {
 		success: function() {}
 	});
 }
+
 export default {
 	connectBLE,
 	releaseBle,
@@ -1161,6 +922,5 @@ export default {
 	saveBLEDeviceInfo,
 	getBLEDeviceInfo,
 	clrBLEDeviceInfo,
-	isDeviceConnected,
 	connectBLEConnected
 };
