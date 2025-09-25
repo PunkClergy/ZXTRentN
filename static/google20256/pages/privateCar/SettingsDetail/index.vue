@@ -150,7 +150,7 @@
 						fallback: () => console.log('用户取消输入操作密码')
 					},
 					default: {
-						url: `/pages/listOfPrivateCars/setting/index?sign=${sign}&deviceIDC=${this.deviceIDC}&orgKey=${this.orgKey}`
+						url: `/pages/privateCar/btSettings/index?sign=${sign}&deviceIDC=${this.deviceIDC}&orgKey=${this.orgKey}`
 					}
 				};
 				const action = actionMap[sign] || actionMap.default;
