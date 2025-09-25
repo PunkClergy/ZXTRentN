@@ -909,7 +909,7 @@
 
 			handleToConfigure: function() {
 				uni.redirectTo({
-					url: '/pages/listOfPrivateCars/setting/index?sign=4'
+					url: '/pages/listOfPrivateCars/btSettings/index?sign=4'
 				});
 			},
 
