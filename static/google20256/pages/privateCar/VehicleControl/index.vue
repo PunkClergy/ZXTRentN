@@ -72,7 +72,7 @@
 				<view class="title-bold">手动操作</view>
 				<view class="more-functions" @tap="handleToConfigure">
 					<text>更多钥匙功能</text>
-					<image src="/static/assets/images/home/right_1.png" />
+					<image src="/static/privateCar/right_1.png" />
 				</view>
 			</view>
 			<view class="control-grid">
