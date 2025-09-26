@@ -412,7 +412,9 @@
 			const sign = options?.sign || ''; // 从参数获取sign值
 			if (options?.sign === '1' || options?.sign == '3' || options?.sign == '5') {
 				// 如果sign为1则处理请求
-
+				uni.showLoading({
+					title: '蓝牙连接中...'
+				})
 				this.deviceIDC = options?.deviceIDC
 				// 默认设备ID
 				this.orgKey = this.keyToHexArray(options?.orgKey)
@@ -429,6 +431,7 @@
 		},
 		// 页面显示生命周期
 		onShow() {
+
 			this.initToConfigureCache();
 			// 获取设备屏幕信息
 			this.initialScreenInfo()
@@ -526,6 +529,7 @@
 
 			// 配对按钮点击处理
 			btnPair() {
+				const platform = uni.getSystemInfoSync().platform;
 				const that = this;
 				const deviceInfo = uni.getDeviceInfo(); // 获取设备信息
 				if (that.connectionState == '已连接') {
@@ -533,9 +537,23 @@
 					if (deviceInfo.system.toLowerCase().includes('android')) {
 						// 发送配对命令
 						that.btnCmdSend(34, [1, 0, 0, 0, 0, 0, 0, 0]);
-						setTimeout(() => {
-							bleKeyManager.makePair(); // 执行配对
-						}, 200);
+						uni.showModal({
+							title: '提示',
+							content: `请跳转系统蓝牙列表点击设备名称为${this.deviceIDC}的设备`,
+							showCancel: true, // 是否显示取消按钮，默认 true
+							cancelText: '取消', // 取消按钮文字（最多4个字符）
+							cancelColor: '#000000', // 取消按钮颜色
+							confirmText: '确定', // 确认按钮文字（最多4个字符）
+							confirmColor: '#3CC51F', // 确认按钮颜色
+							success: () => {
+								const Intent = plus.android.importClass("android.content.Intent");
+								const Settings = plus.android.importClass("android.provider.Settings");
+								const mainActivity = plus.android.runtimeMainActivity();
+								const intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
+								mainActivity.startActivity(intent);
+							}
+						});
+
 					} else {
 						// iOS系统处理流程
 						that.btnCmdSend(34, [1, 0, 0, 0, 0, 0, 0, 0]);
@@ -595,14 +613,12 @@
 				that.pageInterval = setInterval(() => {
 					if (bleKeyManager.getBLEConnectionState()) {
 						// 已连接状态
-
 						this.connectionState = '已连接'
 						this.connectionID = bleKeyManager.getBLEConnectionID()
 						this.connectionDisplay = that.connectionID
 
 					} else {
 						// 未连接状态
-
 						this.connectionState = '未连接'
 						this.connectionID = ''
 						this.connectionDisplay = '未连接'
