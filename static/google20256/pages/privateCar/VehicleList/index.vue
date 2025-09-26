@@ -434,7 +434,7 @@
 					item
 				} = evt.currentTarget.dataset;
 				uni.navigateTo({
-					url: `/pages/listOfPrivateCars/index?sn=${item.sn}&bluetoothKey=${item.bluetoothKey}`
+					url: `/pages/privateCar/SettingsDetail/index?sn=${item.sn}&bluetoothKey=${item.bluetoothKey}`
 				});
 			},
 
@@ -689,7 +689,7 @@
 				const sign = evt?.currentTarget?.dataset?.sign || evt;
 				const getActionMap = (item) => ({
 					default: {
-						url: `/pages/listOfPrivateCars/setting/index?sign=${sign}&deviceIDC=${item?.sn}&orgKey=${item?.bluetoothKey}`
+						url: `/pages/privateCar/btSettings/index?sign=${sign}&deviceIDC=${item?.sn}&orgKey=${item?.bluetoothKey}`
 					}
 				});
 				const executeNavigation = (ele) => {
