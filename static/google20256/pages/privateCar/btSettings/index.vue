@@ -431,7 +431,7 @@
 		},
 		// 页面显示生命周期
 		onShow() {
-
+// 蓝牙连接应该放在这里
 			this.initToConfigureCache();
 			// 获取设备屏幕信息
 			this.initialScreenInfo()
@@ -545,12 +545,14 @@
 							cancelColor: '#000000', // 取消按钮颜色
 							confirmText: '确定', // 确认按钮文字（最多4个字符）
 							confirmColor: '#3CC51F', // 确认按钮颜色
-							success: () => {
-								const Intent = plus.android.importClass("android.content.Intent");
-								const Settings = plus.android.importClass("android.provider.Settings");
-								const mainActivity = plus.android.runtimeMainActivity();
-								const intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
-								mainActivity.startActivity(intent);
+							success: (res) => {
+								if (res.confirm) {
+									const Intent = plus.android.importClass("android.content.Intent");
+									const Settings = plus.android.importClass("android.provider.Settings");
+									const mainActivity = plus.android.runtimeMainActivity();
+									const intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
+									mainActivity.startActivity(intent);
+								}
 							}
 						});
 
