@@ -1,6 +1,5 @@
 <template>
 	<view class="settings-container">
-
 		<CustomNavBar :title="headerTitle" />
 		<!-- 设置项列表 -->
 		<scroll-view class="settings-list" scroll-y :style="'margin-top: ' + (navbarTotalHeight) + 'px;'">
@@ -160,7 +159,6 @@
 
 <script>
 	// 导入工具模块
-	// const bleKeyManager = require('../../../utils/BleKeyFun-utils.js'); // 蓝牙钥匙功能工具
 	import bleKeyManager from "@/utils/BleKeyFun-utils-single.js"
 	import CustomNavBar from "@/components/custom-header/index.vue";
 	import {
@@ -409,32 +407,19 @@
 			}
 		},
 		onLoad(options) {
+			this.options = options
 			const sign = options?.sign || ''; // 从参数获取sign值
-			if (options?.sign === '1' || options?.sign == '3' || options?.sign == '5') {
-				// 如果sign为1则处理请求
-				uni.showLoading({
-					title: '蓝牙连接中...'
-				})
-				this.deviceIDC = options?.deviceIDC
-				// 默认设备ID
-				this.orgKey = this.keyToHexArray(options?.orgKey)
-				setTimeout(() => {
-					this.handleRequest(options);
-				}, 500)
-			}
-			// 设置页面数据
-
-			this.sign = sign
-			// 设置sign值
+			this.sign = sign // 设置sign值
 			this.headerTitle = this.getHeaderTitle(sign) // 设置标题
 
 		},
 		// 页面显示生命周期
 		onShow() {
-// 蓝牙连接应该放在这里
 			this.initToConfigureCache();
 			// 获取设备屏幕信息
 			this.initialScreenInfo()
+			// 蓝牙初始化
+			this.handleInitializeBluetooth()
 		},
 		// 页面卸载生命周期
 		onUnload() {
@@ -448,6 +433,21 @@
 			});
 		},
 		methods: {
+			handleInitializeBluetooth() {
+				const sign = this.sign
+				if (sign === '1' || sign == '3' || sign == '5') {
+					// 如果sign为1则处理请求
+					uni.showLoading({
+						title: '蓝牙连接中...'
+					})
+					this.deviceIDC = this.options?.deviceIDC
+					// 默认设备ID
+					this.orgKey = this.keyToHexArray(this.options?.orgKey)
+					setTimeout(() => {
+						this.handleRequest(this.options);
+					}, 500)
+				}
+			},
 			// 获取屏幕信息
 			async initialScreenInfo() {
 				try {
@@ -788,7 +788,10 @@
 						}
 					);
 				} else {
-					uni.showModal('已连接蓝牙', false, () => {}); // 提示已连接
+					uni.showModal({
+						title: '提示',
+						content: '蓝牙已连接'
+					})
 				}
 			},
 
