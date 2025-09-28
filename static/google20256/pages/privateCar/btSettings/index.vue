@@ -22,7 +22,7 @@
 						<view style="display: flex; flex-direction: row; align-items: center; font-size: 26rpx"
 							@tap="handleDistance">
 							<text>开锁{{ parsedData.unlock || 0 }}，关锁{{ parsedData.lock || 0 }}</text>
-							<image class="item-arrow" src="/static/assets/images/home/right_1.png"></image>
+							<image class="item-arrow" src="/static/privateCar/right_1.png"></image>
 						</view>
 					</view>
 					<view class="settings-item">
@@ -57,7 +57,7 @@
 						<view style="display: flex; flex-direction: row; align-items: center; font-size: 26rpx">
 							<text style="font-size: 24rpx; color: #999">当前所在位置距离设备信号值 :
 								{{ signalCache[signalCache.length - 1] }}</text>
-							<image class="item-arrow" src="/static/assets/images/home/right_1.png"></image>
+							<image class="item-arrow" src="/static/privateCar/right_1.png"></image>
 						</view>
 					</view>
 				</view>
@@ -103,9 +103,9 @@
 							<text class="item-text">{{ item.name }}</text>
 						</view>
 						<view>
-							<image class="item-arrow" src="/static/assets/images/home/down.png"
+							<image class="item-arrow" src="/static/privateCar/down.png"
 								v-if="instruction_type == item.id" />
-							<image class="item-arrow" src="/static/assets/images/home/right_1.png" v-else />
+							<image class="item-arrow" src="/static/privateCar/right_1.png" v-else />
 						</view>
 					</view>
 				</view>
@@ -120,7 +120,7 @@
 								</view>
 								<view class="key-control-picker">
 									<text class="text-color">{{ item.useType }}</text>
-									<image class="item-arrow" src="/static/assets/images/home/right_1.png"></image>
+									<image class="item-arrow" src="/static/privateCar/right_1.png"></image>
 								</view>
 							</view>
 						</picker>
@@ -305,12 +305,6 @@
 		3: '按键设置',
 		default: '设置' // 默认标题
 	};
-	// 图片映射数组
-	const IMAGE_MAP = [{
-		path: '/static/assets/images/home/car-bg.png',
-		// 图片路径
-		key: 's_background_picture_of_the_front_page' // 对应的data键名
-	}];
 
 	// 页面定义
 	export default {
@@ -1133,6 +1127,7 @@
 		background-color: #ffffff;
 		width: 98%;
 		margin: 10rpx auto;
+		border-bottom: 1px solid #f0f0f0;
 	}
 
 	.group-title {
