@@ -11,3 +11,9 @@ export const u_getCarBluetoothKeyByCode = (data) => http.get('/renterApi/getCarB
 export const u_paivateAddOrUpdateCar = (data) => http.postFormData('/carapi/addOrUpdateCar', data) //新增设备
 export const u_paivateCarapiDeleteCar = (data) => http.postFormData('/carapi/deleteCar', data) //删除设备
 
+
+export const u_paivateUpdateRentKey = (data) => http.postFormData('/rentKeyApi/updateRentKey', data) //新增设备
+export const u_paivateCarList = (data) => http.get('/carapi/getCarList', data) //新增设备
+export const u_paivateRentRecord = (data) => http.get('/rentKeyApi/rentRecord', data) //新增设备
+export const u_paivateSendRentKey = (data) => http.get('/rentKeyApi/sendRentKey', data) //新增设备
+export const u_paivateCancelRentKey = (data) => http.get('/rentKeyApi/cancelRentKey', data) //新增设备
