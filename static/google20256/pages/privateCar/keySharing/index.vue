@@ -310,18 +310,15 @@
 		},
 		data() {
 			return {
-
 				screenInfo: {},
 				// 标签页背景图片（未激活状态）
 				s_background_tabs_1: '/static/privateCar/1-1.png',
 				s_background_tabs_2: '/static/privateCar/1-2.png',
-
 				// 标签页背景图片（激活状态）
 				s_background_tabs_active_1: '/static/privateCar/2-1.png',
 				s_background_tabs_active_2: '/static/privateCar/2-2',
 				//tabs背景
 				searchBarHeight: 80,
-
 
 				// 总导航高度 = 状态栏高度 + 导航栏高度
 				g_page: 1,
@@ -336,11 +333,11 @@
 				y_triggered: false,
 
 				c_tabs: [{
-						name: '报销记录',
+						name: '',
 						value: '1'
 					},
 					{
-						name: '新增报销',
+						name: '',
 						value: '2'
 					}
 				],
