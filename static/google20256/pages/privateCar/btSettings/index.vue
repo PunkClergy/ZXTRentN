@@ -9,7 +9,7 @@
 					style="font-size: 24rpx; display: flex; justify-content: center; flex-direction: column; align-items: center; padding: 20rpx; gap: 20rpx">
 					<text>*请检查蓝牙是否连接，是否已经站在车辆旁。连接蓝牙后才可进行配对。</text>
 					<view @tap="btnPair"
-						style="background-color: #fff; padding: 15rpx 100rpx; font-size: 26rpx; border-radius: 10rpx">
+						style="background-color: #fff; padding: 15rpx 100rpx; font-size: 26rpx; border-radius: 10rpx;border:1px solid #f0f0f0">
 						蓝牙配对</view>
 					<text>发起系统蓝牙与车载设备进行配对，将会弹出配对请求对话框，请点击【配对】。如果在手机系统蓝牙取消了配对，感应将会失效，需重新点击【蓝牙配对】进行配对</text>
 				</view>

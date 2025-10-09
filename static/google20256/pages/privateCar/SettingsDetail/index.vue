@@ -10,7 +10,7 @@
 						<text class="item-text">感应开关锁设置</text>
 						<text class="item-tips">配置蓝牙自动感应参数，如开锁、关锁，感应灵敏度</text>
 					</view>
-					<image class="item-arrow" src="/static/assets/images/home/right_1.png"></image>
+					<image class="item-arrow" src="/static/privateCar/right_1.png"></image>
 				</view>
 			</view>
 			<!-- 个性设置 -->
@@ -20,7 +20,7 @@
 						<text class="item-text">钥匙功能配置</text>
 						<text class="item-tips">开启：功能图标显示在主界面；关闭：图标隐藏</text>
 					</view>
-					<image class="item-arrow" src="/static/assets/images/home/right_1.png"></image>
+					<image class="item-arrow" src="/static/privateCar/right_1.png"></image>
 				</view>
 			</view>
 			<!-- 按键设置 -->
@@ -30,7 +30,7 @@
 						<text class="item-text">按键功能设置</text>
 						<text class="item-tips">该设置用于配置钥匙各项指令对应的按键、时间、流程等</text>
 					</view>
-					<image class="item-arrow" src="/static/assets/images/home/right_1.png"></image>
+					<image class="item-arrow" src="/static/privateCar/right_1.png"></image>
 				</view>
 			</view>
 			<!-- 工程模式 -->
@@ -39,7 +39,7 @@
 					<view class="item-left">
 						<text class="item-text">工程模式</text>
 					</view>
-					<image class="item-arrow" src="/static/assets/images/home/right_1.png"></image>
+					<image class="item-arrow" src="/static/privateCar/right_1.png"></image>
 				</view>
 			</view>
 			<view class="settings-group">
@@ -47,7 +47,7 @@
 					<view class="item-left">
 						<text class="item-text">其他个性设置</text>
 					</view>
-					<image class="item-arrow" src="/static/assets/images/home/right_1.png"></image>
+					<image class="item-arrow" src="/static/privateCar/right_1.png"></image>
 				</view>
 			</view>
 		</scroll-view>
@@ -255,6 +255,6 @@
 
 	/* 最后一个设置项去掉下划线 */
 	.settings-item:last-child {
-		border-bottom: none;
+		/* border-bottom: none; */
 	}
 </style>
