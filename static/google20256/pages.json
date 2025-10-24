@@ -167,6 +167,20 @@
 			{
 				"navigationBarTitleText" : "角色权限绑定"
 			}
+		},
+		{
+			"path" : "pages/useGuide/index",
+			"style" : 
+			{
+				"navigationBarTitleText" : "使用指南"
+			}
+		},
+		{
+			"path" : "components/DropFilterCom/index",
+			"style" : 
+			{
+				"navigationBarTitleText" : ""
+			}
 		}
 	],
 	"globalStyle": {
