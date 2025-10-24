@@ -153,6 +153,20 @@
 			{
 				"navigationBarTitleText" : "查看视频"
 			}
+		},
+		{
+			"path" : "pages/roleSeparation/index",
+			"style" : 
+			{
+				"navigationBarTitleText" : "人员角色设定"
+			}
+		},
+		{
+			"path" : "pages/Jurisdiction/index",
+			"style" : 
+			{
+				"navigationBarTitleText" : "角色权限绑定"
+			}
 		}
 	],
 	"globalStyle": {
