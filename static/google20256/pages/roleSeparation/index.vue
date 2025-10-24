@@ -1,9 +1,8 @@
 <template>
-	<view class="container">
+	<view class="container" :style="{ height: `${safeScreenHeight}px` }">
 		<CustomNavBar title="人员角色设定" />
-		<view class="record-container">
-			<scroll-view scroll-y @scrolltolower="handleLower" @refresherrefresh="handleRefresh"
-				:refresher-enabled="true" :refresher-triggered="g_triggered">
+		<view class="record-container" :style="'margin-top: ' + (navbarTotalHeight) + 'px;'">
+			<scroll-view scroll-y @scrolltolower="lower" :style="'height:' + (safeScreenHeight - (navBarHeight + statusBarHeight +10)) + 'px;'">
 				<view v-for="(item, index) in g_items" :key="index" class="content-item">
 					<view class="content-item-head">
 						<view class="head-left">
@@ -96,10 +95,13 @@
 		u_user_roleapiList
 	} from '@/api'
 	import CustomNavBar from "@/components/custom-header/index.vue";
-
+	import {
+		info_screen
+	} from '@/utils/scheme/screen.js'
 	export default {
 		data() {
 			return {
+				screenInfo: {},
 				navBarHeight: uni.getSystemInfoSync().platform == 'ios' ? 49 : 44,
 				searchBarHeight: 80,
 				g_page: 1,
@@ -118,31 +120,60 @@
 				s_background_picture_of_the_front_page: ''
 			}
 		},
-
+		computed: {
+			// 状态栏高度
+			statusBarHeight() {
+				return this.screenInfo.statusBarHeight || 0;
+			},
+			// 导航栏高度
+			navBarHeight() {
+				return this.screenInfo.platform === 'ios' ? 49 : 44;
+			},
+			// 导航栏总高度（状态栏+导航栏）
+			navbarTotalHeight() {
+				return this.statusBarHeight + this.navBarHeight;
+			},
+			// 安全区域高度
+			safeScreenHeight() {
+				return this.screenInfo.screenHeight || 667;
+			}
+		},
 		onLoad(options) {
 			this.initList()
 		},
 
 		onShow() {
 			this.handleRole()
+			this.initialScreenInfo()
 		},
 		components: {
 			CustomNavBar
 		},
 
 		methods: {
-			// 下拉刷新
-			handleRefresh() {
-				this.g_page = 1
-				this.g_items = []
-				this.initList()
+			// 滚动到底部加载更多
+			lower(e) {
+				if (!this.loading) {
+					this.loading = true;
+					this.g_page++;
+					setTimeout(() => {
+						this.initList();
+						this.loading = false;
+					}, 1000);
+				}
 			},
-
-			// 加载更多
-			handleLower() {
-				// 加载更多逻辑
+			// 获取屏幕信息
+			async initialScreenInfo() {
+				try {
+					this.screenInfo = await info_screen();
+				} catch (error) {
+					console.error('[ScreenInfo] 获取屏幕信息失败:', error);
+					uni.showToast({
+						title: '设备信息获取失败',
+						icon: 'none'
+					});
+				}
 			},
-
 
 			// 人员列表
 			async initList() {
@@ -177,7 +208,7 @@
 								id: id
 							}
 							u_user_delChildUser(params).then(allRes => {
-								console.log(allRes,'9999')
+								console.log(allRes, '9999')
 								if (allRes?.code == 1000) {
 									_this.g_triggered = false
 									_this.g_page = 1
